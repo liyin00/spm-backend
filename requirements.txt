@@ -1,2 +1,2 @@
-Flask==2.0.01
+Flask==2.0.1
 DateTime==4.3
