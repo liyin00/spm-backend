@@ -9,36 +9,29 @@ import json
 app = Flask(__name__)
 CORS(app)  
 app.config['CORS_HEADERS'] = 'Content-Type'
-app.config['SQLALCHEMY_DATABASE_URI'] = environ.get('dbURL')
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root@localhost:3306/lms' #environ.get('dbURL')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {'pool_recycle': 299}
 
 db = SQLAlchemy(app)
 
 class Course(db.Model):
-    __tablename__ = 'account' #waiting for confirmation of table name
+    __tablename__ = 'course'
  
-    CourseID = db.Column(db.Integer, primary_key=True)
-    CourseName = db.Column(db.String(50), nullable=False)
-    CourseDescription = db.Column(db.String(50), nullable=False)
-    StartDate = db.Column(db.DateTime, nullable=False)
-    EndDate = db.Column(db.DateTime, nullable=False)
-    
-    # def __init__(self, id, name, age, phone):
-    def __init__(self, CourseID, CourseName, CourseDescription, StartDate, EndDate):
-        # self.id = id
-        self.CourseID = CourseID
-        self.CourseName = CourseName
-        self.CourseDescription = CourseDescription
-        self.StartDate = StartDate
-        self.EndDate = EndDate
- 
+    courseId = db.Column(db.Integer(), primary_key=True)
+    courseName = db.Column(db.String(250), nullable=False)
+    courseDesc = db.Column(db.String(999), nullable=False)
+    prerequisites = db.Column(db.String(999), nullable=False)
+    isActive = db.Column(db.Integer(), nullable=False)
+
     def json(self):
-        return {"CourseID": self.CourseID, 
-                "CourseName": self.CourseName, 
-                "CourseDescription": self.CourseDescription, 
-                "StartDate": self.StartDate, 
-                "EndDate": self.EndDate}
+        return {"courseId": self.courseId, 
+                "courseName": self.courseName, 
+                "courseDesc": self.courseDesc, 
+                "prerequisites": self.prerequisites, 
+                "isActive": self.isActive}
+
+db.create_all()
 
 #find all courses
 @app.route("/courses")
@@ -47,118 +40,111 @@ def get_all():
     if len(courses):
         return jsonify(
             {
-                "code": 200,
                 "data": {
                     "courses": [course.json() for course in courses]
                 }
             }
-        )
+        ), 200
     return jsonify(
         {
-            "code": 404,
-            "message": "There are no course information."
+            "message": "There is no available course information."
         }
     ), 404
 
-#search course by courseid
-@app.route("/course/<int:CourseID>")
-def find_by_CourseID(CourseID):
-    course = Course.query.filter_by(CourseID=CourseID).first()
+#search course by course name
+@app.route("/course/<string:courseName>", methods=['GET'])
+def find_by_CourseID(courseName):
+    course = Course.query.filter_by(courseName=courseName).first()
     if course:
         return jsonify(
 
             {
-                "code": 200,
                 "data": course.json()
             }
-        )
+        ), 200
     return jsonify(
         {
-            "code": 404,
             "message": "Course Info not found."
         }
     ), 404
 
-#add course
+#add new course
 @app.route("/course/add", methods=['POST'])
 def create_course():
     data = request.get_json()
-    course_info = Course(**data)
-   
+
+    if bool(Course.query.filter_by(courseName=data['courseName']).first()):
+        return jsonify(
+            {
+                "message": "There is an existing course with the same name."
+            }
+        ), 500
+    
+    course_info = Course(courseName=data['courseName'], courseDesc=data['courseDesc'],
+                        prerequisites=data['prerequisites'], isActive=data['isActive'])
     try:
         db.session.add(course_info)
         db.session.commit()
     except:
         return jsonify(
             {
-                "code": 500,
-                # "data": {
-                #     "phone": patient_info.phone
-                # },
                 "message": "An error occurred when creating the course."
             }
         ), 500
 
     return jsonify(
         {
-            "code": 201,
             "data": course_info.json()
         }
     ), 201
 
-#delete course
-@app.route("/course/delete", methods=['POST'])
-def delete_course():
-    data = request.get_json()
-    CourseID = data['CourseID']
-    course = Course.query.filter_by(CourseID=CourseID).first()
+#delete course by course name
+@app.route("/course/delete/<string:courseName>", methods=['POST'])
+def delete_course(courseName):
+    course = Course.query.filter_by(courseName=courseName).first()
     if course:
         db.session.delete(course)
         db.session.commit()
         return jsonify(
             {
-                "code": 200,
-                "data": {
-                    "CourseID": CourseID
-                }
+                "message": "Course was successfully deleted."
             }
-        )
+        ),200
     return jsonify(
         {
-            "code": 404,
-            "data": {
-                "CourseID": CourseID
-            },
-            "message": "Course info not found."
+            "message": "Course was not found."
         }
     ), 404
 
-#update courses
+#update course by course name
+#currently cannot edit the course name itself as i need the name to search the database, will find a work around later on
 @app.route("/course/update", methods=['POST'])
-def update_by_CourseID():
+def update_by_courseName():
     data = request.get_json()
-    CourseID = data['CourseID']
-    course_info = Course.query.filter_by(CourseID=CourseID).first()
-    course_info.CourseName = data.CourseName
-    course_info.CourseDescription = data.CourseDescription
-    course_info.StartDate = data.StartDate
-    course_info.EndDate = data.EndDate
+    courseName = data['courseName']
+    
+    if bool(Course.query.filter_by(courseName=courseName).first()) == False:
+        return jsonify(
+            {
+                "message": "This course does not exist."
+            }
+        ), 404
+
+    course_info = Course.query.filter_by(courseName=courseName).first()
+    course_info.courseDesc = data['courseDesc']
+    course_info.prerequisites = data['prerequisites']
+    course_info.isActive = data['isActive']
     try:
         db.session.commit()
     except:
         return jsonify(
             {
-                "code": 500,
-                # "data": {
-                #     "phone": patient_info.phone
-                # },
                 "message": "An error occurred when updating the course."
             }
         ), 500
 
     return jsonify(
         {
-            "code": 201,
             "data": course_info.json()
         }
     ), 201
