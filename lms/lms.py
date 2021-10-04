@@ -23,7 +23,7 @@ class Course(db.Model):
     CourseDescription = db.Column(db.String(50), nullable=False)
     StartDate = db.Column(db.DateTime, nullable=False)
     EndDate = db.Column(db.DateTime, nullable=False)
- 
+    
     # def __init__(self, id, name, age, phone):
     def __init__(self, CourseID, CourseName, CourseDescription, StartDate, EndDate):
         # self.id = id
