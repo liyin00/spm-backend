@@ -1,6 +1,7 @@
 import unittest
 import flask_testing
 import json
+from datetime import datetime
 from lms import app, db, Course
 
 class TestApp(flask_testing.TestCase):
@@ -141,14 +142,14 @@ class TestCourses(TestApp):
             "message": "There is an existing course with the same name."
         })
 
-    #test delete a course by course name
+    #test delete a course by courseId
     def test_delete_existing_course(self):
-        c1 = Course(courseName = 'abc', courseDesc = '123',
+        c1 = Course(courseId = 1, courseName = 'abc', courseDesc = '123',
                     prerequisites = "def", isActive = 1)
         db.session.add(c1)
         db.session.commit()
 
-        response = self.client.post("/course/delete/abc")
+        response = self.client.post("/course/delete/1")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json, {
             "message": "Course was successfully deleted."
@@ -156,12 +157,12 @@ class TestCourses(TestApp):
 
     #test delete a course that does not exist
     def test_delete_nonexisting_course(self):
-        c1 = Course(courseName = 'abc', courseDesc = '123',
+        c1 = Course(courseId = 1, courseName = 'abc', courseDesc = '123',
                     prerequisites = "def", isActive = 1)
         db.session.add(c1)
         db.session.commit()
 
-        response = self.client.post("/course/delete/cba")
+        response = self.client.post("/course/delete/2")
         self.assertEqual(response.status_code, 404)
         self.assertEqual(response.json, {
             "message": "Course was not found."
@@ -175,7 +176,8 @@ class TestCourses(TestApp):
         db.session.commit()
 
         request_body = {
-            "courseName": 'abc',
+            "courseId": 1,
+            "courseName": 'cab',
             "courseDesc": '321',
             "prerequisites": "fed",
             "isActive": 0
@@ -188,7 +190,7 @@ class TestCourses(TestApp):
         self.assertEqual(response.json, {
             "data":{
                 "courseId": 1,
-                "courseName": 'abc',
+                "courseName": 'cab',
                 "courseDesc": '321',
                 "prerequisites": "fed",
                 "isActive": 0
@@ -199,6 +201,7 @@ class TestCourses(TestApp):
     def test_edit_nonexistent_course(self):
 
         request_body = {
+            "courseId": 1,
             "courseName": 'abc',
             "courseDesc": '321',
             "prerequisites": "fed",
@@ -212,76 +215,6 @@ class TestCourses(TestApp):
         self.assertEqual(response.json, {
             "message": "This course does not exist."
         })
-
-#     def test_create_consultation_invalid_doctor(self):
-#         p1 = Patient(name='Hyacinth Bucket', title='Mrs',
-#                      contact_num='+65 8888 8888', ewallet_balance=15)
-#         db.session.add(p1)
-#         db.session.commit()
-
-#         request_body = {
-#             'doctor_id': p1.id,
-#             'patient_id': p1.id,
-#             'diagnosis': 'Itchy armpits',
-#             'prescription': 'Better deodrant',
-#             'length': 15
-#         }
-
-#         response = self.client.post("/consultations",
-#                                     data=json.dumps(request_body),
-#                                     content_type='application/json')
-#         self.assertEqual(response.status_code, 500)
-#         self.assertEqual(response.json, {
-#             'message': 'Doctor not valid.'
-#         })
-
-#     def test_create_consultation_invalid_patient(self):
-#         d1 = Doctor(name='Imran', title='Dr',
-#                     reg_num='UKM123', hourly_rate=30)
-#         db.session.add(d1)
-#         db.session.commit()
-
-#         request_body = {
-#             'doctor_id': d1.id,
-#             'patient_id': d1.id,
-#             'diagnosis': 'Itchy armpits',
-#             'prescription': 'Better deodrant',
-#             'length': 15
-#         }
-
-#         response = self.client.post("/consultations",
-#                                     data=json.dumps(request_body),
-#                                     content_type='application/json')
-#         self.assertEqual(response.status_code, 500)
-#         self.assertEqual(response.json, {
-#             'message': 'Patient not valid.'
-#         })
-
-#     def test_create_consultation_insufficient_balance(self):
-#         d1 = Doctor(name='Imran', title='Dr',
-#                     reg_num='UKM123', hourly_rate=30)
-#         p1 = Patient(name='Hyacinth Bucket', title='Mrs',
-#                      contact_num='+65 8888 8888', ewallet_balance=15)
-#         db.session.add(d1)
-#         db.session.add(p1)
-#         db.session.commit()
-
-#         request_body = {
-#             'doctor_id': d1.id,
-#             'patient_id': p1.id,
-#             'diagnosis': 'Itchy armpits',
-#             'prescription': 'Better deodrant',
-#             'length': 60
-#         }
-
-#         response = self.client.post("/consultations",
-#                                     data=json.dumps(request_body),
-#                                     content_type='application/json')
-#         self.assertEqual(response.status_code, 500)
-#         self.assertEqual(response.json, {
-#             'message': 'Patient does not have enough e-wallet funds.'
-#         })
-
 
 
 if __name__ == '__main__':
