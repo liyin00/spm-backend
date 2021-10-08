@@ -38,7 +38,7 @@ class CourseClass(db.Model):
     courseId = db.Column(db.Integer(), nullable=False)
     startDateTime = db.Column(db.DateTime(), nullable=True)
     endDateTime = db.Column(db.DateTime(), nullable=True)
-    learnersId = db.Column(db.PickleType(), nullable=True)
+    learnerIds = db.Column(db.String(999), nullable=True)
     trainerId = db.Column(db.Integer(), nullable=True)
     classSize = db.Column(db.Integer(), nullable=True)
 
@@ -47,7 +47,7 @@ class CourseClass(db.Model):
                 "courseId": self.courseId, 
                 "startDateTime": self.startDateTime, 
                 "endDateTime": self.endDateTime, 
-                "learnersId": self.learnersId, 
+                "learnerId": self.learnerIds, 
                 "trainerId": self.trainerId,
                 "classSize": self.classSize}
 
@@ -78,7 +78,6 @@ def find_by_CourseID(courseName):
     course = Course.query.filter_by(courseName=courseName).first()
     if course:
         return jsonify(
-
             {
                 "data": course.json()
             }
@@ -119,7 +118,7 @@ def create_course():
         }
     ), 201
 
-#delete course by course name
+#delete course by courseId
 @app.route("/course/delete/<int:courseId>", methods=['POST'])
 def delete_course(courseId):
     course = Course.query.filter_by(courseId=courseId).first()
@@ -137,21 +136,21 @@ def delete_course(courseId):
         }
     ), 404
 
-#update course by course name
-#currently cannot edit the course name itself as i need the name to search the database, will find a work around later on
+#update course by courseId
 @app.route("/course/update", methods=['POST'])
 def update_by_courseName():
     data = request.get_json()
-    courseName = data['courseName']
+    courseId = data['courseId']
     
-    if bool(Course.query.filter_by(courseName=courseName).first()) == False:
+    if bool(Course.query.filter_by(courseId=courseId).first()) == False:
         return jsonify(
             {
                 "message": "This course does not exist."
             }
         ), 404
 
-    course_info = Course.query.filter_by(courseName=courseName).first()
+    course_info = Course.query.filter_by(courseId=courseId).first()
+    course_info.courseName = data['courseName']
     course_info.courseDesc = data['courseDesc']
     course_info.prerequisites = data['prerequisites']
     course_info.isActive = data['isActive']
@@ -173,6 +172,22 @@ def update_by_courseName():
 
 #start of CRUD Classes------------------------------------------------------------------------
 #find class based on courseId
+@app.route("/courseclass/<int:courseId>", methods=['GET'])
+def find_class_by_CourseID(courseId):
+    course_classes = CourseClass.query.filter_by(courseId=courseId).all()
+    if course_classes:
+        return jsonify(
+            {
+                "data": {
+                    "classes": [course_class.json() for course_class in course_classes]
+                }
+            }
+        ), 200
+    return jsonify(
+        {
+            "message": "Classes was not found."
+        }
+    ), 404
 
 
 if __name__ == '__main__':
