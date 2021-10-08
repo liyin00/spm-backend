@@ -143,12 +143,12 @@ class TestCourses(TestApp):
 
     #test delete a course by course name
     def test_delete_existing_course(self):
-        c1 = Course(courseName = 'abc', courseDesc = '123',
+        c1 = Course(courseId = 1, courseName = 'abc', courseDesc = '123',
                     prerequisites = "def", isActive = 1)
         db.session.add(c1)
         db.session.commit()
 
-        response = self.client.post("/course/delete/abc")
+        response = self.client.post("/course/delete/1")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json, {
             "message": "Course was successfully deleted."
@@ -156,12 +156,12 @@ class TestCourses(TestApp):
 
     #test delete a course that does not exist
     def test_delete_nonexisting_course(self):
-        c1 = Course(courseName = 'abc', courseDesc = '123',
+        c1 = Course(courseId = 1, courseName = 'abc', courseDesc = '123',
                     prerequisites = "def", isActive = 1)
         db.session.add(c1)
         db.session.commit()
 
-        response = self.client.post("/course/delete/cba")
+        response = self.client.post("/course/delete/2")
         self.assertEqual(response.status_code, 404)
         self.assertEqual(response.json, {
             "message": "Course was not found."

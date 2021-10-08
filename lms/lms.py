@@ -31,8 +31,29 @@ class Course(db.Model):
                 "prerequisites": self.prerequisites, 
                 "isActive": self.isActive}
 
+class CourseClass(db.Model):
+    __tablename__ = 'courseclass'
+ 
+    courseClassId = db.Column(db.Integer(), primary_key=True)
+    courseId = db.Column(db.Integer(), nullable=False)
+    startDateTime = db.Column(db.DateTime(), nullable=True)
+    endDateTime = db.Column(db.DateTime(), nullable=True)
+    learnersId = db.Column(db.PickleType(), nullable=True)
+    trainerId = db.Column(db.Integer(), nullable=True)
+    classSize = db.Column(db.Integer(), nullable=True)
+
+    def json(self):
+        return {"courseClassId": self.courseClassId,
+                "courseId": self.courseId, 
+                "startDateTime": self.startDateTime, 
+                "endDateTime": self.endDateTime, 
+                "learnersId": self.learnersId, 
+                "trainerId": self.trainerId,
+                "classSize": self.classSize}
+
 db.create_all()
 
+#start of CRUD Courses-----------------------------------------------------------
 #find all courses
 @app.route("/courses")
 def get_all():
@@ -99,9 +120,9 @@ def create_course():
     ), 201
 
 #delete course by course name
-@app.route("/course/delete/<string:courseName>", methods=['POST'])
-def delete_course(courseName):
-    course = Course.query.filter_by(courseName=courseName).first()
+@app.route("/course/delete/<int:courseId>", methods=['POST'])
+def delete_course(courseId):
+    course = Course.query.filter_by(courseId=courseId).first()
     if course:
         db.session.delete(course)
         db.session.commit()
@@ -148,6 +169,11 @@ def update_by_courseName():
             "data": course_info.json()
         }
     ), 201
+#end of CRUD courses--------------------------------------------------------------------------
+
+#start of CRUD Classes------------------------------------------------------------------------
+#find class based on courseId
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5001, debug=True)
