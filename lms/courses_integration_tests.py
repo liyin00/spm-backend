@@ -1,6 +1,7 @@
 import unittest
 import flask_testing
 import json
+from datetime import datetime
 from lms import app, db, Course
 
 class TestApp(flask_testing.TestCase):
@@ -141,7 +142,7 @@ class TestCourses(TestApp):
             "message": "There is an existing course with the same name."
         })
 
-    #test delete a course by course name
+    #test delete a course by courseId
     def test_delete_existing_course(self):
         c1 = Course(courseId = 1, courseName = 'abc', courseDesc = '123',
                     prerequisites = "def", isActive = 1)

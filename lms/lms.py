@@ -38,7 +38,7 @@ class CourseClass(db.Model):
     courseId = db.Column(db.Integer(), nullable=False)
     startDateTime = db.Column(db.DateTime(), nullable=True)
     endDateTime = db.Column(db.DateTime(), nullable=True)
-    learnerIds = db.Column(db.String(999), nullable=True)
+    learnerIds = db.Column(db.PickleType(), nullable=True)
     trainerId = db.Column(db.Integer(), nullable=True)
     classSize = db.Column(db.Integer(), nullable=True)
 
@@ -47,7 +47,7 @@ class CourseClass(db.Model):
                 "courseId": self.courseId, 
                 "startDateTime": self.startDateTime, 
                 "endDateTime": self.endDateTime, 
-                "learnerId": self.learnerIds, 
+                "learnerIds": self.learnerIds, 
                 "trainerId": self.trainerId,
                 "classSize": self.classSize}
 
@@ -138,7 +138,7 @@ def delete_course(courseId):
 
 #update course by courseId
 @app.route("/course/update", methods=['POST'])
-def update_by_courseName():
+def update_by_courseId():
     data = request.get_json()
     courseId = data['courseId']
     
@@ -172,7 +172,7 @@ def update_by_courseName():
 
 #start of CRUD Classes------------------------------------------------------------------------
 #find class based on courseId
-@app.route("/courseclass/<int:courseId>", methods=['GET'])
+@app.route("/class/<int:courseId>", methods=['GET'])
 def find_class_by_CourseID(courseId):
     course_classes = CourseClass.query.filter_by(courseId=courseId).all()
     if course_classes:
@@ -189,6 +189,200 @@ def find_class_by_CourseID(courseId):
         }
     ), 404
 
+#add new class using courseId
+@app.route("/class/add", methods=['POST'])
+def create_class():
+    data = request.get_json()
+
+    if bool(Course.query.filter_by(courseId=data['courseId']).first()) == False:
+        return jsonify(
+            {
+                "message": "This course does not exist."
+            }
+        ), 404
+    startDate = data['startDateTime'].split('/') #DD/MM/YYYY format
+    endDate = data['endDateTime'].split('/') #DD/MM/YYYY format
+    class_info = CourseClass(courseId=data['courseId'], startDateTime=datetime(int(startDate[2]),int(startDate[1]),int(startDate[0])),
+                        endDateTime=datetime(int(endDate[2]),int(endDate[1]),int(endDate[0])), learnerIds=data['learnerIds'], 
+                        trainerId=data['trainerId'],classSize=data['classSize'])
+    try:
+        db.session.add(class_info)
+        db.session.commit()
+    except:
+        return jsonify(
+            {
+                "message": "An error occurred when creating the class."
+            }
+        ), 500
+
+    return jsonify(
+        {
+            "data": class_info.json()
+        }
+    ), 201
+
+#delete class
+@app.route("/class/delete/<int:courseClassId>", methods=['POST'])
+def delete_class(courseClassId):
+    class_info = CourseClass.query.filter_by(courseClassId=courseClassId).first()
+    if class_info:
+        db.session.delete(class_info)
+        db.session.commit()
+        return jsonify(
+            {
+                "message": "Class was successfully deleted."
+            }
+        ),200
+    return jsonify(
+        {
+            "message": "Class was not found."
+        }
+    ), 404
+
+#add new learner into class
+@app.route("/class/add/learner", methods=['POST'])
+def add_new_learner():
+    data = request.get_json()
+    id = data['learnerId']
+
+    if bool(CourseClass.query.filter_by(courseClassId=data['courseClassId']).first()) == False:
+        return jsonify(
+            {
+                "message": "This class does not exist."
+            }
+        ), 404
+
+    class_info = CourseClass.query.filter_by(courseClassId=data['courseClassId']).first()
+    new_dict = dict(class_info.learnerIds) #pickletype is not mutable unless you assign it onto another variable
+    if id in new_dict:
+        return jsonify(
+            {
+                "message": "Learner is already in this class."
+            }
+        ), 500
+
+    new_dict[id] = 0
+    class_info.learnerIds = new_dict
+
+    try:
+        db.session.commit()
+    except:
+        return jsonify(
+            {
+                "message": "An error occurred when adding learner to the class."
+            }
+        ), 500
+
+    return jsonify(
+        {
+            "data": class_info.json()
+        }
+    ), 201
+
+#accept new learner into class
+@app.route("/class/accept/learner", methods=['POST'])
+def accept_new_learner():
+    data = request.get_json()
+    id = data['learnerId']
+
+    if bool(CourseClass.query.filter_by(courseClassId=data['courseClassId']).first()) == False:
+        return jsonify(
+            {
+                "message": "This class does not exist."
+            }
+        ), 404
+
+    class_info = CourseClass.query.filter_by(courseClassId=data['courseClassId']).first()
+    new_dict = dict(class_info.learnerIds) #pickletype is not mutable unless you assign it onto another variable
+    new_dict[id] = 1
+    class_info.learnerIds = new_dict
+
+    try:
+        db.session.commit()
+    except:
+        return jsonify(
+            {
+                "message": "An error occurred when accepting learner to the class."
+            }
+        ), 500
+
+    return jsonify(
+        {
+            "data": class_info.json()
+        }
+    ), 201
+
+#add new trainer into class
+@app.route("/class/add/trainer", methods=['POST'])
+def add_new_trainer():
+    data = request.get_json()
+    id = data['trainerId']
+
+    if bool(CourseClass.query.filter_by(courseClassId=data['courseClassId']).first()) == False:
+        return jsonify(
+            {
+                "message": "This class does not exist."
+            }
+        ), 404
+
+    class_info = CourseClass.query.filter_by(courseClassId=data['courseClassId']).first()
+    class_info.trainerId = id
+
+    try:
+        db.session.commit()
+    except:
+        return jsonify(
+            {
+                "message": "An error occurred when adding trainer to the class."
+            }
+        ), 500
+
+    return jsonify(
+        {
+            "data": class_info.json()
+        }
+    ), 201
+
+#delete learner from class
+@app.route("/class/delete/learner", methods=['POST'])
+def cancel_learner():
+    data = request.get_json()
+    id = data['learnerId']
+
+    if bool(CourseClass.query.filter_by(courseClassId=data['courseClassId']).first()) == False:
+        return jsonify(
+            {
+                "message": "This class does not exist."
+            }
+        ), 404
+
+    class_info = CourseClass.query.filter_by(courseClassId=data['courseClassId']).first()
+    new_dict = dict(class_info.learnerIds) #pickletype is not mutable unless you assign it onto another variable
+    if not(id in new_dict):
+        return jsonify(
+            {
+                "message": "Learner is not in this class."
+            }
+        ), 404
+
+    del new_dict[id]
+    class_info.learnerIds = new_dict
+
+    try:
+        db.session.commit()
+    except:
+        return jsonify(
+            {
+                "message": "An error occurred when deleting learner from the class."
+            }
+        ), 500
+
+    return jsonify(
+        {
+            "data": class_info.json()
+        }
+    ), 201
+#end of CRUD classes--------------------------------------------------------------------------
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5001, debug=True)
