@@ -102,7 +102,7 @@ create table quizoutcome
     PRIMARY KEY (quizOutcomeId),
     FOREIGN KEY fk1 (quizId) REFERENCES quiz(quizId),
     FOREIGN KEY fk2 (lessonId) REFERENCES quiz(lessonId),
-    FOREIGN KEY fk3 (courseId) REFERENCES quiz(courseId),
+    FOREIGN KEY fk3 (courseId) REFERENCES course(courseId),
     FOREIGN KEY fk4 (courseClassId) REFERENCES courseClass(courseClassId),
     FOREIGN KEY fk5 (userId) REFERENCES user(userId)
 );
