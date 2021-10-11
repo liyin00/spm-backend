@@ -51,6 +51,31 @@ class CourseClass(db.Model):
                 "trainerId": self.trainerId,
                 "classSize": self.classSize}
 
+class User(db.Model):
+    __tablename__ = 'user'
+
+    userId = db.Column(db.Integer(), primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    subrole = db.Column(db.String(100), nullable=False)
+    department = db.Column(db.String(100), nullable=False)
+    email = db.Column(db.String(100), nullable=False)
+    password = db.Column(db.String(255), nullable=False)
+
+    def json(self):
+        return {"userId": self.userId,
+                "name": self.name, 
+                "subrole": self.subrole, 
+                "department": self.department, 
+                "email": self.email}
+
+    def json_with_password(self):
+        return {"userId": self.userId,
+                "name": self.name, 
+                "subrole": self.subrole, 
+                "department": self.department, 
+                "email": self.email, 
+                "password": self.password}
+
 db.create_all()
 
 #start of CRUD Courses-----------------------------------------------------------
