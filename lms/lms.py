@@ -51,6 +51,31 @@ class CourseClass(db.Model):
                 "trainerId": self.trainerId,
                 "classSize": self.classSize}
 
+class User(db.Model):
+    __tablename__ = 'user'
+
+    userId = db.Column(db.Integer(), primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    subrole = db.Column(db.String(100), nullable=False)
+    department = db.Column(db.String(100), nullable=False)
+    email = db.Column(db.String(100), nullable=False)
+    password = db.Column(db.String(255), nullable=False)
+
+    def json(self):
+        return {"userId": self.userId,
+                "name": self.name, 
+                "subrole": self.subrole, 
+                "department": self.department, 
+                "email": self.email}
+
+    def json_with_password(self):
+        return {"userId": self.userId,
+                "name": self.name, 
+                "subrole": self.subrole, 
+                "department": self.department, 
+                "email": self.email, 
+                "password": self.password}
+
 db.create_all()
 
 #start of CRUD Courses-----------------------------------------------------------
@@ -383,6 +408,139 @@ def cancel_learner():
         }
     ), 201
 #end of CRUD classes--------------------------------------------------------------------------
+
+#start of CRUD users-----------------------------------------------------------
+#find all users
+@app.route("/user", methods=['GET'])
+def get_all_users():
+    users = User.query.all()
+    if len(users):
+        return jsonify(
+            {
+                "data": {
+                    "users": [user.json() for user in users]
+                }
+            }
+        ), 200
+    return jsonify(
+        {
+            "message": "There are no available users."
+        }
+    ), 404
+
+#search user by user's name
+@app.route("/user/name/<string:name>", methods=['GET'])
+def get_user_by_name(name):
+    user = User.query.filter_by(name=name).first()
+    if user:
+        return jsonify(
+            {
+                "data": user.json()
+            }
+        ), 200
+    return jsonify(
+        {
+            "message": "User not found."
+        }
+    ), 404
+
+#search user by userId
+@app.route("/user/id/<string:userId>", methods=['GET'])
+def get_user_by_userId(userId):
+    user = User.query.filter_by(userId=userId).first()
+    if user:
+        return jsonify(
+            {
+                "data": user.json()
+            }
+        ), 200
+    return jsonify(
+        {
+            "message": "User not found."
+        }
+    ), 404
+
+#add new user
+@app.route("/user", methods=['POST'])
+def create_user():
+    data = request.get_json()
+
+    if bool(User.query.filter_by(name=data['name']).first()):
+        return jsonify(
+            {
+                "message": "There is an existing user with the same name."
+            }
+        ), 500
+    
+    user_info = User(name=data['name'], subrole=data['subrole'],
+                        department=data['department'], email=data['email'])
+    try:
+        db.session.add(user_info)
+        db.session.commit()
+    except:
+        return jsonify(
+            {
+                "message": "An error occurred when creating the user."
+            }
+        ), 500
+
+    return jsonify(
+        {
+            "data": user_info.json()
+        }
+    ), 201
+
+#delete user by userId
+@app.route("/user/<int:userId>", methods=['DELETE'])
+def delete_user(userId):
+    user = User.query.filter_by(userId=userId).first()
+    if user:
+        db.session.delete(user)
+        db.session.commit()
+        return jsonify(
+            {
+                "message": "User was successfully deleted."
+            }
+        ),200
+    return jsonify(
+        {
+            "message": "User was not found."
+        }
+    ), 404
+
+#update user by userId
+@app.route("/user", methods=['PATCH'])
+def update_user_by_userId():
+    data = request.get_json()
+    userId = data['userId']
+    
+    if bool(User.query.filter_by(userId=userId).first()) == False:
+        return jsonify(
+            {
+                "message": "This user does not exist."
+            }
+        ), 404
+
+    user_info = User.query.filter_by(userId=userId).first()
+    user_info.name = data['name']
+    user_info.subrole = data['subrole']
+    user_info.department = data['department']
+    user_info.email = data['email']
+    try:
+        db.session.commit()
+    except:
+        return jsonify(
+            {
+                "message": "An error occurred when updating the user."
+            }
+        ), 500
+
+    return jsonify(
+        {
+            "data": user_info.json()
+        }
+    ), 201
+#end of CRUD users--------------------------------------------------------------------------
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5001, debug=True)
