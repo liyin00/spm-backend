@@ -540,6 +540,21 @@ def update_user_by_userId():
             "data": user_info.json()
         }
     ), 201
+
+@app.route("/user/engineer/name/<string:name>", methods=['GET'])
+def get_engineers_by_name(name):
+    engineers = db.session.query(User).filter(User.department=="Engineer", User.name.like("%"+name+"%")).all()
+    if engineers:
+        return jsonify(
+            {
+                "data": engineers.json()
+            }
+        ), 200
+    return jsonify(
+        {
+            "message": "Engineer not found."
+        }
+    ), 404
 #end of CRUD users--------------------------------------------------------------------------
 
 if __name__ == '__main__':
