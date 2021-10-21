@@ -11,6 +11,7 @@ create table user
     subrole varchar(100) NOT NULL,
     department varchar(100) NOT NULL,
     email varchar(100) NOT NULL,
+    password varchar(255) NOT NULL,
     PRIMARY KEY (userId)
 );
 
