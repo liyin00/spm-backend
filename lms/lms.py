@@ -111,6 +111,7 @@ def find_by_CourseID(courseName):
         {
             "message": "Course Info not found."
         }
+        console.log("hello")
     ), 404
 
 #add new course
