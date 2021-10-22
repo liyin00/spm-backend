@@ -445,7 +445,8 @@ def find_lesson_by_courseClassId(courseClassId):
         }
     ), 404
 
-@app.route("/lesson/add", method=['POST'])
+#add new lesson using courseClassId
+@app.route("/lesson/add", methods=['POST'])
 def create_lesson():
     data = request.get_json()
 
@@ -470,7 +471,7 @@ def create_lesson():
 
     return jsonify(
         {
-            "data": lesson_info.json
+            "data": lesson_info.json()
         }
     ), 201
 
