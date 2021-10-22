@@ -21,7 +21,7 @@ class Course(db.Model):
     courseId = db.Column(db.Integer(), primary_key=True)
     courseName = db.Column(db.String(250), nullable=False)
     courseDesc = db.Column(db.String(999), nullable=False)
-    prerequisites = db.Column(db.String(999), nullable=False)
+    prerequisites = db.Column(db.String(999), nullable=False) #db cannot store list NEEDS CHANGE
     isActive = db.Column(db.Integer(), nullable=False)
 
     def json(self):
@@ -50,6 +50,22 @@ class CourseClass(db.Model):
                 "learnerIds": self.learnerIds, 
                 "trainerId": self.trainerId,
                 "classSize": self.classSize}
+
+class Lesson(db.Model):
+    __tablename__ = 'lesson'
+    
+    lessonId = db.Column(db.Integer(), primary_key=True)
+    courseClassId = db.Column(db.Integer(), nullable = False)
+    lessonName = db.Column(db.String(250), nullable=False)
+    lessonContent = db.Column(db.PickleType(), nullable=True) #db cannot store list NEEDS CHANGE
+    links = db.Column(db.PickleType(), nullable=True) #db cannot store list NEEDS CHANGE
+
+    def json(self):
+        return {"lessonId": self.lessonId,
+                "courseClassId": self.courseClassId, 
+                "lessonName": self.lessonName, 
+                "lessonContent": self.lessonContent, 
+                "links": self.links}
 
 class User(db.Model):
     __tablename__ = 'user'
@@ -409,6 +425,75 @@ def cancel_learner():
         }
     ), 201
 #end of CRUD classes--------------------------------------------------------------------------
+
+#start of create sections-----------------------------------------------------------
+#find lessons based on courseClassId
+@app.route('/lessons/<int:courseClassId>')
+def find_lesson_by_courseClassId(courseClassId):
+    lessons = Lesson.query.filter_by(courseClassId=courseClassId).all()
+    if lessons:
+        return jsonify(
+            {
+                "data": {
+                    "lessons": [lesson.json() for lesson in lessons]
+                }
+            }
+        ), 200
+    return jsonify(
+        {
+            "message": "Lessons for this course class cannot be found."
+        }
+    ), 404
+
+#add new lesson using courseClassId
+@app.route("/lesson/add", methods=['POST'])
+def create_lesson():
+    data = request.get_json()
+
+    if bool(CourseClass.query.filter_by(courseClassId=data['courseClassId']).first()) == False:
+        return jsonify(
+            {
+                "message": "This class does not exist."
+            }
+        ), 404
+
+    lesson_info = Lesson(courseClassId = data['courseClassId'], lessonName = data['lessonName'],
+                        lessonContent = data['lessonContent'], links = data['links'])
+    try:
+        db.session.add(lesson_info)
+        db.session.commit()
+    except:
+        return jsonify(
+            {
+                "message": "An error occurred when creating the lesson."
+            }
+        ), 500
+
+    return jsonify(
+        {
+            "data": lesson_info.json()
+        }
+    ), 201
+
+#delete lesson
+@app.route("/lesson/delete/<int:lessonId>", methods=['POST'])
+def delete_lesson(lessonId):
+    lesson_info = Lesson.query.filter_by(lessonId=lessonId).first()
+    if lesson_info:
+        db.session.delete(lesson_info)
+        db.session.commit()
+        return jsonify(
+            {
+                "message": "Lesson was successfully deleted."
+            }
+        ),200
+    return jsonify(
+        {
+            "message": "Lesson was not found."
+        }
+    ), 404
+
+#end of create sections--------------------------------------------------------------------------
 
 #start of CRUD users-----------------------------------------------------------
 #find all users
