@@ -128,5 +128,37 @@ class TestLessons(TestApp):
             "message": "This class does not exist."
         })
 
+    #test delete lesson by lessonId
+    def test_delete_existing_lesson(self):
+        l1 = Lesson(courseClassId = 1, lessonName = 'abc',
+                    lessonContent = {'a': 1, 'b': 0, 'c': 1}, links = {'a': 1, 'b': 0, 'c': 1})
+        l2 = Lesson(courseClassId = 1, lessonName = 'bac',
+                    lessonContent = {'a': 1, 'b': 0, 'c': 1}, links = {'a': 1, 'b': 0, 'c': 1})
+        db.session.add(l1)
+        db.session.add(l2)
+        db.session.commit()
+
+        response = self.client.post("/lesson/delete/1")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json, {
+            "message": "Lesson was successfully deleted."
+        })
+
+    #test delete lesson that does not exist
+    def test_delete_existing_lesson(self):
+        l1 = Lesson(courseClassId = 1, lessonName = 'abc',
+                    lessonContent = {'a': 1, 'b': 0, 'c': 1}, links = {'a': 1, 'b': 0, 'c': 1})
+        l2 = Lesson(courseClassId = 1, lessonName = 'bac',
+                    lessonContent = {'a': 1, 'b': 0, 'c': 1}, links = {'a': 1, 'b': 0, 'c': 1})
+        db.session.add(l1)
+        db.session.add(l2)
+        db.session.commit()
+
+        response = self.client.post("/lesson/delete/3")
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.json, {
+            "message": "Lesson was not found."
+        })
+
 if __name__ == '__main__':
     unittest.main()

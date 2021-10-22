@@ -475,6 +475,24 @@ def create_lesson():
         }
     ), 201
 
+#delete lesson
+@app.route("/lesson/delete/<int:lessonId>", methods=['POST'])
+def delete_lesson(lessonId):
+    lesson_info = Lesson.query.filter_by(lessonId=lessonId).first()
+    if lesson_info:
+        db.session.delete(lesson_info)
+        db.session.commit()
+        return jsonify(
+            {
+                "message": "Lesson was successfully deleted."
+            }
+        ),200
+    return jsonify(
+        {
+            "message": "Lesson was not found."
+        }
+    ), 404
+
 #end of create sections--------------------------------------------------------------------------
 
 #start of CRUD users-----------------------------------------------------------
