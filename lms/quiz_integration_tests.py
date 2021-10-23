@@ -3,7 +3,7 @@ from flask.globals import request
 import flask_testing
 import json
 from datetime import datetime
-from lmsquiz import app, db, Quiz
+from lms import app, db, Quiz
 
 class TestApp(flask_testing.TestCase):
     app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite://"
