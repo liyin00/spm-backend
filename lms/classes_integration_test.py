@@ -132,33 +132,33 @@ class TestCourseClasses(TestApp):
             "message": "This course does not exist."
         })
 
-#     #test delete class by courseClassId
-#     def test_delete_existing_class(self):
-#         cc1 = CourseClass(courseClassId = 1, courseId = 1, startDateTime = datetime(2021, 10, 8), 
-#                             endDateTime = datetime(2021, 10, 9), learnerIds = {'a': 1, 'b': 0, 'c': 1},
-#                             trainerId = 1, classSize = 10)
-#         db.session.add(cc1)
-#         db.session.commit()
+    #test delete class by courseClassId
+    def test_delete_existing_class(self):
+        cc1 = CourseClass(courseClassId = 1, courseId = 1, startDateTime = datetime(2021, 10, 8), 
+                            endDateTime = datetime(2021, 10, 9), learnerIds = "{'a': 1, 'b': 0, 'c': 1}",
+                            trainerId = 1, classSize = 10)
+        db.session.add(cc1)
+        db.session.commit()
 
-#         response = self.client.post("/class/delete/1")
-#         self.assertEqual(response.status_code, 200)
-#         self.assertEqual(response.json, {
-#             "message": "Class was successfully deleted."
-#         })
+        response = self.client.post("/class/delete/1")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json, {
+            "message": "Class was successfully deleted."
+        })
 
-#     #test delete class that does not exist
-#     def test_delete_nonexisting_class(self):
-#         cc1 = CourseClass(courseClassId = 1, courseId = 1, startDateTime = datetime(2021, 10, 8), 
-#                             endDateTime = datetime(2021, 10, 9), learnerIds = {'a': 1, 'b': 0, 'c': 1},
-#                             trainerId = 1, classSize = 10)
-#         db.session.add(cc1)
-#         db.session.commit()
+    #test delete class that does not exist
+    def test_delete_nonexisting_class(self):
+        cc1 = CourseClass(courseClassId = 1, courseId = 1, startDateTime = datetime(2021, 10, 8), 
+                            endDateTime = datetime(2021, 10, 9), learnerIds = "{'a': 1, 'b': 0, 'c': 1}",
+                            trainerId = 1, classSize = 10)
+        db.session.add(cc1)
+        db.session.commit()
 
-#         response = self.client.post("/class/delete/2")
-#         self.assertEqual(response.status_code, 404)
-#         self.assertEqual(response.json, {
-#             "message": "Class was not found."
-#         })
+        response = self.client.post("/class/delete/2")
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.json, {
+            "message": "Class was not found."
+        })
 
     #test add new learner to class
     def test_add_new_learner(self):
@@ -189,147 +189,147 @@ class TestCourseClasses(TestApp):
             }
         })
 
-#     #test add learner to non-exising class
-#     def test_add_learner_nonexisting_class(self):
-#         cc1 = CourseClass(courseClassId = 1, courseId = 1, startDateTime = datetime(2021, 10, 8), 
-#                             endDateTime = datetime(2021, 10, 9), learnerIds = {'a': 1, 'b': 0, 'c': 1},
-#                             trainerId = 1, classSize = 10)
-#         db.session.add(cc1)
-#         db.session.commit()
+    #test add learner to non-exising class
+    def test_add_learner_nonexisting_class(self):
+        cc1 = CourseClass(courseClassId = 1, courseId = 1, startDateTime = datetime(2021, 10, 8), 
+                            endDateTime = datetime(2021, 10, 9), learnerIds = "{'a': 1, 'b': 0, 'c': 1}",
+                            trainerId = 1, classSize = 10)
+        db.session.add(cc1)
+        db.session.commit()
 
-#         request_body = {
-#             "courseClassId": 2,
-#             "learnerId": 'd'
-#         }
+        request_body = {
+            "courseClassId": 2,
+            "learnerId": 'd'
+        }
 
-#         response = self.client.post("/class/add/learner",
-#                                     data=json.dumps(request_body),
-#                                     content_type='application/json')
-#         self.assertEqual(response.status_code, 404)
-#         self.assertEqual(response.json, {
-#                 "message": "This class does not exist."
-#         })
+        response = self.client.post("/class/add/learner",
+                                    data=json.dumps(request_body),
+                                    content_type='application/json')
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.json, {
+                "message": "This class does not exist."
+        })
 
-#     #test add existing learner to class
-#     def test_add_learner_nonexisting_class(self):
-#         cc1 = CourseClass(courseClassId = 1, courseId = 1, startDateTime = datetime(2021, 10, 8), 
-#                             endDateTime = datetime(2021, 10, 9), learnerIds = {'a': 1, 'b': 0, 'c': 1},
-#                             trainerId = 1, classSize = 10)
-#         db.session.add(cc1)
-#         db.session.commit()
+    #test add existing learner to class
+    def test_add_existing_learner_to_class(self):
+        cc1 = CourseClass(courseClassId = 1, courseId = 1, startDateTime = datetime(2021, 10, 8), 
+                            endDateTime = datetime(2021, 10, 9), learnerIds = "{'a': 1, 'b': 0, 'c': 1}",
+                            trainerId = 1, classSize = 10)
+        db.session.add(cc1)
+        db.session.commit()
 
-#         request_body = {
-#             "courseClassId": 1,
-#             "learnerId": 'a'
-#         }
+        request_body = {
+            "courseClassId": 1,
+            "learnerId": 'a'
+        }
 
-#         response = self.client.post("/class/add/learner",
-#                                     data=json.dumps(request_body),
-#                                     content_type='application/json')
-#         self.assertEqual(response.status_code, 500)
-#         self.assertEqual(response.json, {
-#                 "message": "Learner is already in this class."
-#         })
+        response = self.client.post("/class/add/learner",
+                                    data=json.dumps(request_body),
+                                    content_type='application/json')
+        self.assertEqual(response.status_code, 500)
+        self.assertEqual(response.json, {
+                "message": "Learner is already in this class."
+        })
 
-#     #test accept new learner to class
-#     def test_accept_new_learner(self):
-#         cc1 = CourseClass(courseClassId = 1, courseId = 1, startDateTime = datetime(2021, 10, 8), 
-#                             endDateTime = datetime(2021, 10, 9), learnerIds = {'a': 1, 'b': 0, 'c': 1, 'd': 0},
-#                             trainerId = 1, classSize = 10)
-#         db.session.add(cc1)
-#         db.session.commit()
+    #test accept new learner to class
+    def test_accept_new_learner(self):
+        cc1 = CourseClass(courseClassId = 1, courseId = 1, startDateTime = datetime(2021, 10, 8), 
+                            endDateTime = datetime(2021, 10, 9), learnerIds = "{'a': 1, 'b': 0, 'c': 1, 'd': 0}",
+                            trainerId = 1, classSize = 10)
+        db.session.add(cc1)
+        db.session.commit()
 
-#         request_body = {
-#             "courseClassId": 1,
-#             "learnerId": 'd'
-#         }
+        request_body = {
+            "courseClassId": 1,
+            "learnerId": 'd'
+        }
 
-#         response = self.client.post("/class/accept/learner",
-#                                     data=json.dumps(request_body),
-#                                     content_type='application/json')
-#         self.assertEqual(response.status_code, 201)
-#         self.assertEqual(response.json, {
-#             "data":{
-#                 "classSize": 10,
-#                 "courseClassId": 1,
-#                 "courseId": 1,
-#                 "endDateTime": 'Sat, 09 Oct 2021 00:00:00 GMT',
-#                 "learnerIds": {'a': 1, 'b': 0, 'c': 1, 'd': 1},
-#                 "startDateTime": 'Fri, 08 Oct 2021 00:00:00 GMT',
-#                 "trainerId": 1
-#             }
-#         })
+        response = self.client.post("/class/accept/learner",
+                                    data=json.dumps(request_body),
+                                    content_type='application/json')
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.json, {
+            "data":{
+                "classSize": 10,
+                "courseClassId": 1,
+                "courseId": 1,
+                "endDateTime": 'Sat, 09 Oct 2021 00:00:00 GMT',
+                "learnerIds": {'a': 1, 'b': 0, 'c': 1, 'd': 1},
+                "startDateTime": 'Fri, 08 Oct 2021 00:00:00 GMT',
+                "trainerId": 1
+            }
+        })
 
-#     #test accept learner to non-exising class
-#     def test_accept_learner_nonexisting_class(self):
-#         cc1 = CourseClass(courseClassId = 1, courseId = 1, startDateTime = datetime(2021, 10, 8), 
-#                             endDateTime = datetime(2021, 10, 9), learnerIds = {'a': 1, 'b': 0, 'c': 1, 'd': 0},
-#                             trainerId = 1, classSize = 10)
-#         db.session.add(cc1)
-#         db.session.commit()
+    #test accept learner to non-exising class
+    def test_accept_learner_nonexisting_class(self):
+        cc1 = CourseClass(courseClassId = 1, courseId = 1, startDateTime = datetime(2021, 10, 8), 
+                            endDateTime = datetime(2021, 10, 9), learnerIds = "{'a': 1, 'b': 0, 'c': 1, 'd': 0}",
+                            trainerId = 1, classSize = 10)
+        db.session.add(cc1)
+        db.session.commit()
 
-#         request_body = {
-#             "courseClassId": 2,
-#             "learnerId": 'd'
-#         }
+        request_body = {
+            "courseClassId": 2,
+            "learnerId": 'd'
+        }
 
-#         response = self.client.post("/class/add/learner",
-#                                     data=json.dumps(request_body),
-#                                     content_type='application/json')
-#         self.assertEqual(response.status_code, 404)
-#         self.assertEqual(response.json, {
-#                 "message": "This class does not exist."
-#         })
+        response = self.client.post("/class/add/learner",
+                                    data=json.dumps(request_body),
+                                    content_type='application/json')
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.json, {
+                "message": "This class does not exist."
+        })
 
-#     #test add new trainer to class
-#     def test_add_new_trainer(self):
-#         cc1 = CourseClass(courseClassId = 1, courseId = 1, startDateTime = datetime(2021, 10, 8), 
-#                             endDateTime = datetime(2021, 10, 9), learnerIds = {'a': 1, 'b': 0, 'c': 1},
-#                             trainerId = 1, classSize = 10)
-#         db.session.add(cc1)
-#         db.session.commit()
+    #test add new trainer to class
+    def test_add_new_trainer(self):
+        cc1 = CourseClass(courseClassId = 1, courseId = 1, startDateTime = datetime(2021, 10, 8), 
+                            endDateTime = datetime(2021, 10, 9), learnerIds = "{'a': 1, 'b': 0, 'c': 1}",
+                            trainerId = 1, classSize = 10)
+        db.session.add(cc1)
+        db.session.commit()
 
-#         request_body = {
-#             "courseClassId": 1,
-#             "trainerId": 2
-#         }
+        request_body = {
+            "courseClassId": 1,
+            "trainerId": 2
+        }
 
-#         response = self.client.post("/class/add/trainer",
-#                                     data=json.dumps(request_body),
-#                                     content_type='application/json')
-#         self.assertEqual(response.status_code, 201)
-#         self.assertEqual(response.json, {
-#             "data":{
-#                 "classSize": 10,
-#                 "courseClassId": 1,
-#                 "courseId": 1,
-#                 "endDateTime": 'Sat, 09 Oct 2021 00:00:00 GMT',
-#                 "learnerIds": {'a': 1, 'b': 0, 'c': 1},
-#                 "startDateTime": 'Fri, 08 Oct 2021 00:00:00 GMT',
-#                 "trainerId": 2
-#             }
-#         })
+        response = self.client.post("/class/add/trainer",
+                                    data=json.dumps(request_body),
+                                    content_type='application/json')
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.json, {
+            "data":{
+                "classSize": 10,
+                "courseClassId": 1,
+                "courseId": 1,
+                "endDateTime": 'Sat, 09 Oct 2021 00:00:00 GMT',
+                "learnerIds": {'a': 1, 'b': 0, 'c': 1},
+                "startDateTime": 'Fri, 08 Oct 2021 00:00:00 GMT',
+                "trainerId": 2
+            }
+        })
 
-#     #test add new trainer to non-existing class
-#     def test_add_trainer_nonexisting_class(self):
-#         cc1 = CourseClass(courseClassId = 1, courseId = 1, startDateTime = datetime(2021, 10, 8), 
-#                             endDateTime = datetime(2021, 10, 9), learnerIds = {'a': 1, 'b': 0, 'c': 1},
-#                             trainerId = 1, classSize = 10)
-#         db.session.add(cc1)
-#         db.session.commit()
+    #test add new trainer to non-existing class
+    def test_add_trainer_nonexisting_class(self):
+        cc1 = CourseClass(courseClassId = 1, courseId = 1, startDateTime = datetime(2021, 10, 8), 
+                            endDateTime = datetime(2021, 10, 9), learnerIds = "{'a': 1, 'b': 0, 'c': 1}",
+                            trainerId = 1, classSize = 10)
+        db.session.add(cc1)
+        db.session.commit()
 
-#         request_body = {
-#             "courseClassId": 2,
-#             "trainerId": 2
-#         }
+        request_body = {
+            "courseClassId": 2,
+            "trainerId": 2
+        }
 
-#         response = self.client.post("/class/add/trainer",
-#                                     data=json.dumps(request_body),
-#                                     content_type='application/json')
-#         self.assertEqual(response.status_code, 404)
-#         self.assertEqual(response.json, {
-#             "message": "This class does not exist."
-#         })
+        response = self.client.post("/class/add/trainer",
+                                    data=json.dumps(request_body),
+                                    content_type='application/json')
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.json, {
+            "message": "This class does not exist."
+        })
 
 #     #test delete existing learner from class
 #     def test_delete_learner_from_class(self):

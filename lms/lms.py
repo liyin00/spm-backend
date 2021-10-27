@@ -330,6 +330,7 @@ def add_new_learner():
                 "message": "An error occurred when adding learner to the class."
             }
         ), 500
+
     class_info.learnerIds = CourseClass.change_to_dict(class_info)
     return jsonify(
         {
@@ -351,9 +352,9 @@ def accept_new_learner():
         ), 404
 
     class_info = CourseClass.query.filter_by(courseClassId=data['courseClassId']).first()
-    new_dict = dict(class_info.learnerIds) #pickletype is not mutable unless you assign it onto another variable
+    new_dict = CourseClass.change_to_dict(class_info)
     new_dict[id] = 1
-    class_info.learnerIds = new_dict
+    class_info.learnerIds = str(new_dict)
 
     try:
         db.session.commit()
@@ -364,6 +365,7 @@ def accept_new_learner():
             }
         ), 500
 
+    class_info.learnerIds = CourseClass.change_to_dict(class_info)
     return jsonify(
         {
             "data": class_info.json()
@@ -395,6 +397,7 @@ def add_new_trainer():
             }
         ), 500
 
+    class_info.learnerIds = CourseClass.change_to_dict(class_info)
     return jsonify(
         {
             "data": class_info.json()
