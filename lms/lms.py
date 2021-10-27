@@ -3,7 +3,7 @@ from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 from os import environ
-from datetime import datetime
+from datetime import date
 import json
 
 app = Flask(__name__)
@@ -38,10 +38,16 @@ class CourseClass(db.Model):
     courseId = db.Column(db.Integer(), nullable=False)
     startDateTime = db.Column(db.DateTime(), nullable=True)
     endDateTime = db.Column(db.DateTime(), nullable=True)
-    learnerIds = db.Column(db.PickleType(), nullable=True)
+    learnerIds = db.Column(db.String(999), nullable=False) #if it is empty, insert an empty dict
     trainerId = db.Column(db.Integer(), nullable=True)
     classSize = db.Column(db.Integer(), nullable=True)
 
+    def change_to_dict(self):
+        string = self.learnerIds
+        json_acceptable_string = string.replace("'", "\"")
+        new_dict = json.loads(json_acceptable_string)
+        return new_dict
+    
     def json(self):
         return {"courseClassId": self.courseClassId,
                 "courseId": self.courseId, 
@@ -57,9 +63,23 @@ class Lesson(db.Model):
     lessonId = db.Column(db.Integer(), primary_key=True)
     courseClassId = db.Column(db.Integer(), nullable = False)
     lessonName = db.Column(db.String(250), nullable=False)
-    lessonContent = db.Column(db.PickleType(), nullable=True) #db cannot store list NEEDS CHANGE
-    links = db.Column(db.PickleType(), nullable=True) #db cannot store list NEEDS CHANGE
+    lessonContent = db.Column(db.String(999), nullable=True)
+    links = db.Column(db.String(999), nullable=True) 
 
+    def lessonContent_to_list(self):
+        if self.lessonContent == None:
+            return None
+        string = self.lessonContent
+        list = string.split('||')
+        return list
+
+    def links_to_list(self):
+        if self.links == None:
+            return None
+        string = self.links
+        list = string.split(' ')
+        return list
+    
     def json(self):
         return {"lessonId": self.lessonId,
                 "courseClassId": self.courseClassId, 
@@ -225,6 +245,8 @@ def update_by_courseId():
 def find_class_by_CourseID(courseId):
     course_classes = CourseClass.query.filter_by(courseId=courseId).all()
     if course_classes:
+        for class_info in course_classes:
+            class_info.learnerIds = CourseClass.change_to_dict(class_info)
         return jsonify(
             {
                 "data": {
@@ -251,8 +273,9 @@ def create_class():
         ), 404
     startDate = data['startDateTime'].split('/') #DD/MM/YYYY format
     endDate = data['endDateTime'].split('/') #DD/MM/YYYY format
-    class_info = CourseClass(courseId=data['courseId'], startDateTime=datetime(int(startDate[2]),int(startDate[1]),int(startDate[0])),
-                        endDateTime=datetime(int(endDate[2]),int(endDate[1]),int(endDate[0])), learnerIds=data['learnerIds'], 
+    learnerIds = data['learnerIds']
+    class_info = CourseClass(courseId=data['courseId'], startDateTime=date(int(startDate[2]),int(startDate[1]),int(startDate[0])),
+                        endDateTime=date(int(endDate[2]),int(endDate[1]),int(endDate[0])), learnerIds=str(learnerIds), 
                         trainerId=data['trainerId'],classSize=data['classSize'])
     try:
         db.session.add(class_info)
@@ -263,7 +286,7 @@ def create_class():
                 "message": "An error occurred when creating the class."
             }
         ), 500
-
+    class_info.learnerIds = CourseClass.change_to_dict(class_info)
     return jsonify(
         {
             "data": class_info.json()
@@ -302,7 +325,7 @@ def add_new_learner():
         ), 404
 
     class_info = CourseClass.query.filter_by(courseClassId=data['courseClassId']).first()
-    new_dict = dict(class_info.learnerIds) #pickletype is not mutable unless you assign it onto another variable
+    new_dict = CourseClass.change_to_dict(class_info)
     if id in new_dict:
         return jsonify(
             {
@@ -311,7 +334,7 @@ def add_new_learner():
         ), 500
 
     new_dict[id] = 0
-    class_info.learnerIds = new_dict
+    class_info.learnerIds = str(new_dict)
 
     try:
         db.session.commit()
@@ -322,6 +345,7 @@ def add_new_learner():
             }
         ), 500
 
+    class_info.learnerIds = CourseClass.change_to_dict(class_info)
     return jsonify(
         {
             "data": class_info.json()
@@ -342,9 +366,9 @@ def accept_new_learner():
         ), 404
 
     class_info = CourseClass.query.filter_by(courseClassId=data['courseClassId']).first()
-    new_dict = dict(class_info.learnerIds) #pickletype is not mutable unless you assign it onto another variable
+    new_dict = CourseClass.change_to_dict(class_info)
     new_dict[id] = 1
-    class_info.learnerIds = new_dict
+    class_info.learnerIds = str(new_dict)
 
     try:
         db.session.commit()
@@ -355,6 +379,7 @@ def accept_new_learner():
             }
         ), 500
 
+    class_info.learnerIds = CourseClass.change_to_dict(class_info)
     return jsonify(
         {
             "data": class_info.json()
@@ -386,6 +411,7 @@ def add_new_trainer():
             }
         ), 500
 
+    class_info.learnerIds = CourseClass.change_to_dict(class_info)
     return jsonify(
         {
             "data": class_info.json()
@@ -406,7 +432,7 @@ def cancel_learner():
         ), 404
 
     class_info = CourseClass.query.filter_by(courseClassId=data['courseClassId']).first()
-    new_dict = dict(class_info.learnerIds) #pickletype is not mutable unless you assign it onto another variable
+    new_dict = CourseClass.change_to_dict(class_info)
     if not(id in new_dict):
         return jsonify(
             {
@@ -415,7 +441,7 @@ def cancel_learner():
         ), 404
 
     del new_dict[id]
-    class_info.learnerIds = new_dict
+    class_info.learnerIds = str(new_dict)
 
     try:
         db.session.commit()
@@ -426,6 +452,7 @@ def cancel_learner():
             }
         ), 500
 
+    class_info.learnerIds = CourseClass.change_to_dict(class_info)
     return jsonify(
         {
             "data": class_info.json()
@@ -439,6 +466,9 @@ def cancel_learner():
 def find_lesson_by_courseClassId(courseClassId):
     lessons = Lesson.query.filter_by(courseClassId=courseClassId).all()
     if lessons:
+        for lesson_info in lessons:
+            lesson_info.lessonContent = Lesson.lessonContent_to_list(lesson_info)
+            lesson_info.links = Lesson.links_to_list(lesson_info)
         return jsonify(
             {
                 "data": {
@@ -463,9 +493,10 @@ def create_lesson():
                 "message": "This class does not exist."
             }
         ), 404
-
+    lessonContent_string = '||'.join(data['lessonContent'])
+    links_string = ' '.join(data['links'])
     lesson_info = Lesson(courseClassId = data['courseClassId'], lessonName = data['lessonName'],
-                        lessonContent = data['lessonContent'], links = data['links'])
+                        lessonContent = lessonContent_string, links = links_string)
     try:
         db.session.add(lesson_info)
         db.session.commit()
@@ -476,6 +507,8 @@ def create_lesson():
             }
         ), 500
 
+    lesson_info.lessonContent = Lesson.lessonContent_to_list(lesson_info)
+    lesson_info.links = Lesson.links_to_list(lesson_info)
     return jsonify(
         {
             "data": lesson_info.json()

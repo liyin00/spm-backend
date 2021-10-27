@@ -26,9 +26,8 @@ class TestLessons(TestApp):
     #test search lessons by courseClassId
     def test_search_lessons_by_courseClassId(self):
         l1 = Lesson(courseClassId = 1, lessonName = 'abc',
-                    lessonContent = {'a': 1, 'b': 0, 'c': 1}, links = {'a': 1, 'b': 0, 'c': 1})
-        l2 = Lesson(courseClassId = 1, lessonName = 'bac',
-                    lessonContent = {'a': 1, 'b': 0, 'c': 1}, links = {'a': 1, 'b': 0, 'c': 1})
+                    lessonContent = "abc||123||lol", links = "www.google.com www.googledrive.com")
+        l2 = Lesson(courseClassId = 1, lessonName = 'bac')
         db.session.add(l1)
         db.session.add(l2)
         db.session.commit()
@@ -43,15 +42,15 @@ class TestLessons(TestApp):
                         "lessonId": 1,
                         "courseClassId": 1, 
                         "lessonName": 'abc', 
-                        "lessonContent": {'a': 1, 'b': 0, 'c': 1}, 
-                        "links": {'a': 1, 'b': 0, 'c': 1}
+                        "lessonContent": ["abc", "123", "lol"], 
+                        "links": ["www.google.com", "www.googledrive.com"]
                     },
                     {
                         "lessonId": 2,
                         "courseClassId": 1, 
                         "lessonName": 'bac', 
-                        "lessonContent": {'a': 1, 'b': 0, 'c': 1}, 
-                        "links": {'a': 1, 'b': 0, 'c': 1} 
+                        "lessonContent": None, 
+                        "links": None 
                     }
                 ]
             }
@@ -60,9 +59,8 @@ class TestLessons(TestApp):
     #test search invalid courseclassId
     def test_search_lesson_by_invalid_courseClassId(self):
         l1 = Lesson(courseClassId = 1, lessonName = 'abc',
-                    lessonContent = {'a': 1, 'b': 0, 'c': 1}, links = {'a': 1, 'b': 0, 'c': 1})
-        l2 = Lesson(courseClassId = 1, lessonName = 'bac',
-                    lessonContent = {'a': 1, 'b': 0, 'c': 1}, links = {'a': 1, 'b': 0, 'c': 1})
+                    lessonContent = "abc||123||lol", links = "www.google.com www.googledrive.com")
+        l2 = Lesson(courseClassId = 1, lessonName = 'bac')
         db.session.add(l1)
         db.session.add(l2)
         db.session.commit()
@@ -77,7 +75,7 @@ class TestLessons(TestApp):
     #test add lesson
     def test_add_lesson(self):
         cc1 = CourseClass(courseId = 1, startDateTime = datetime(2021, 10, 8), 
-                            endDateTime = datetime(2021, 10, 9), learnerIds = {'a': 1, 'b': 0, 'c': 1},
+                            endDateTime = datetime(2021, 10, 9), learnerIds = "{'a': 1, 'b': 0, 'c': 1}",
                             trainerId = 1, classSize = 10)
         db.session.add(cc1)
         db.session.commit()
@@ -85,8 +83,8 @@ class TestLessons(TestApp):
         request_body = {
             "courseClassId": 1, 
             "lessonName": 'abc', 
-            "lessonContent": {'a': 1, 'b': 0, 'c': 1}, 
-            "links": {'a': 1, 'b': 2, 'c': 3}
+            "lessonContent": ["abc", "123", "lol"], 
+            "links": ["www.google.com", "www.googledrive.com"]
         }
 
         response = self.client.post("/lesson/add",
@@ -99,15 +97,15 @@ class TestLessons(TestApp):
                 "lessonId": 1,
                 "courseClassId": 1, 
                 "lessonName": 'abc', 
-                "lessonContent": {'a': 1, 'b': 0, 'c': 1}, 
-                "links": {'a': 1, 'b': 2, 'c': 3}
+                "lessonContent": ["abc", "123", "lol"], 
+                "links": ["www.google.com", "www.googledrive.com"]
                 }
         })
 
     #test add lesson when courseclass do no exist
     def test_add_lesson_no_class(self):
         cc1 = CourseClass(courseId = 1, startDateTime = datetime(2021, 10, 8), 
-                            endDateTime = datetime(2021, 10, 9), learnerIds = {'a': 1, 'b': 0, 'c': 1},
+                            endDateTime = datetime(2021, 10, 9), learnerIds = "{'a': 1, 'b': 0, 'c': 1}",
                             trainerId = 1, classSize = 10)
         db.session.add(cc1)
         db.session.commit()
@@ -115,8 +113,8 @@ class TestLessons(TestApp):
         request_body = {
             "courseClassId": 2, #wrong courseClassId
             "lessonName": 'abc', 
-            "lessonContent": {'a': 1, 'b': 0, 'c': 1}, 
-            "links": {'a': 1, 'b': 2, 'c': 3}
+            "lessonContent": ["abc", "123", "lol"], 
+            "links": ["www.google.com", "www.googledrive.com"]
         }
 
         response = self.client.post("/lesson/add",
@@ -131,9 +129,8 @@ class TestLessons(TestApp):
     #test delete lesson by lessonId
     def test_delete_existing_lesson(self):
         l1 = Lesson(courseClassId = 1, lessonName = 'abc',
-                    lessonContent = {'a': 1, 'b': 0, 'c': 1}, links = {'a': 1, 'b': 0, 'c': 1})
-        l2 = Lesson(courseClassId = 1, lessonName = 'bac',
-                    lessonContent = {'a': 1, 'b': 0, 'c': 1}, links = {'a': 1, 'b': 0, 'c': 1})
+                    lessonContent = "abc||123||lol", links = "www.google.com www.googledrive.com")
+        l2 = Lesson(courseClassId = 1, lessonName = 'bac')
         db.session.add(l1)
         db.session.add(l2)
         db.session.commit()
@@ -145,11 +142,10 @@ class TestLessons(TestApp):
         })
 
     #test delete lesson that does not exist
-    def test_delete_existing_lesson(self):
+    def test_delete_non_existing_lesson(self):
         l1 = Lesson(courseClassId = 1, lessonName = 'abc',
-                    lessonContent = {'a': 1, 'b': 0, 'c': 1}, links = {'a': 1, 'b': 0, 'c': 1})
-        l2 = Lesson(courseClassId = 1, lessonName = 'bac',
-                    lessonContent = {'a': 1, 'b': 0, 'c': 1}, links = {'a': 1, 'b': 0, 'c': 1})
+                    lessonContent = "abc||123||lol", links = "www.google.com www.googledrive.com")
+        l2 = Lesson(courseClassId = 1, lessonName = 'bac')
         db.session.add(l1)
         db.session.add(l2)
         db.session.commit()
