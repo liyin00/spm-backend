@@ -63,8 +63,8 @@ class Lesson(db.Model):
     lessonId = db.Column(db.Integer(), primary_key=True)
     courseClassId = db.Column(db.Integer(), nullable = False)
     lessonName = db.Column(db.String(250), nullable=False)
-    lessonContent = db.Column(db.String(999), nullable=True) #db cannot store list NEEDS CHANGE
-    links = db.Column(db.String(999), nullable=True) #db cannot store list NEEDS CHANGE
+    lessonContent = db.Column(db.String(999), nullable=True)
+    links = db.Column(db.String(999), nullable=True) 
 
     def lessonContent_to_list(self):
         if self.lessonContent == None:
@@ -493,9 +493,10 @@ def create_lesson():
                 "message": "This class does not exist."
             }
         ), 404
-
+    lessonContent_string = '||'.join(data['lessonContent'])
+    links_string = ' '.join(data['links'])
     lesson_info = Lesson(courseClassId = data['courseClassId'], lessonName = data['lessonName'],
-                        lessonContent = data['lessonContent'], links = data['links'])
+                        lessonContent = lessonContent_string, links = links_string)
     try:
         db.session.add(lesson_info)
         db.session.commit()
@@ -506,6 +507,8 @@ def create_lesson():
             }
         ), 500
 
+    lesson_info.lessonContent = Lesson.lessonContent_to_list(lesson_info)
+    lesson_info.links = Lesson.links_to_list(lesson_info)
     return jsonify(
         {
             "data": lesson_info.json()
