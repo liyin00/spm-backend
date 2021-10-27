@@ -38,10 +38,16 @@ class CourseClass(db.Model):
     courseId = db.Column(db.Integer(), nullable=False)
     startDateTime = db.Column(db.DateTime(), nullable=True)
     endDateTime = db.Column(db.DateTime(), nullable=True)
-    learnerIds = db.Column(db.PickleType(), nullable=True)
+    learnerIds = db.Column(db.String(999), nullable=True)
     trainerId = db.Column(db.Integer(), nullable=True)
     classSize = db.Column(db.Integer(), nullable=True)
 
+    def change_to_dict(self):
+        string = self.learnerIds
+        json_acceptable_string = string.replace("'", "\"")
+        new_dict = json.loads(json_acceptable_string)
+        return new_dict
+    
     def json(self):
         return {"courseClassId": self.courseClassId,
                 "courseId": self.courseId, 
@@ -251,8 +257,9 @@ def create_class():
         ), 404
     startDate = data['startDateTime'].split('/') #DD/MM/YYYY format
     endDate = data['endDateTime'].split('/') #DD/MM/YYYY format
+    learnerIds = data['learnerIds']
     class_info = CourseClass(courseId=data['courseId'], startDateTime=datetime(int(startDate[2]),int(startDate[1]),int(startDate[0])),
-                        endDateTime=datetime(int(endDate[2]),int(endDate[1]),int(endDate[0])), learnerIds=data['learnerIds'], 
+                        endDateTime=datetime(int(endDate[2]),int(endDate[1]),int(endDate[0])), learnerIds=str(learnerIds), 
                         trainerId=data['trainerId'],classSize=data['classSize'])
     try:
         db.session.add(class_info)
@@ -302,7 +309,7 @@ def add_new_learner():
         ), 404
 
     class_info = CourseClass.query.filter_by(courseClassId=data['courseClassId']).first()
-    new_dict = dict(class_info.learnerIds) #pickletype is not mutable unless you assign it onto another variable
+    new_dict = CourseClass.change_to_dict(class_info)
     if id in new_dict:
         return jsonify(
             {
@@ -311,7 +318,7 @@ def add_new_learner():
         ), 500
 
     new_dict[id] = 0
-    class_info.learnerIds = new_dict
+    class_info.learnerIds = str(new_dict)
 
     try:
         db.session.commit()
@@ -321,7 +328,7 @@ def add_new_learner():
                 "message": "An error occurred when adding learner to the class."
             }
         ), 500
-
+    class_info.learnerIds = CourseClass.change_to_dict(class_info)
     return jsonify(
         {
             "data": class_info.json()
