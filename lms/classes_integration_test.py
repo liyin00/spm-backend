@@ -331,76 +331,76 @@ class TestCourseClasses(TestApp):
             "message": "This class does not exist."
         })
 
-#     #test delete existing learner from class
-#     def test_delete_learner_from_class(self):
-#         cc1 = CourseClass(courseClassId = 1, courseId = 1, startDateTime = datetime(2021, 10, 8), 
-#                             endDateTime = datetime(2021, 10, 9), learnerIds = {'a': 1, 'b': 0, 'c': 1},
-#                             trainerId = 1, classSize = 10)
-#         db.session.add(cc1)
-#         db.session.commit()
+    #test delete existing learner from class
+    def test_delete_learner_from_class(self):
+        cc1 = CourseClass(courseClassId = 1, courseId = 1, startDateTime = datetime(2021, 10, 8), 
+                            endDateTime = datetime(2021, 10, 9), learnerIds = "{'a': 1, 'b': 0, 'c': 1}",
+                            trainerId = 1, classSize = 10)
+        db.session.add(cc1)
+        db.session.commit()
 
-#         request_body = {
-#             "courseClassId": 1,
-#             "learnerId": 'a'
-#         }
+        request_body = {
+            "courseClassId": 1,
+            "learnerId": 'a'
+        }
 
-#         response = self.client.post("/class/delete/learner",
-#                                     data=json.dumps(request_body),
-#                                     content_type='application/json')
-#         self.assertEqual(response.status_code, 201)
-#         self.assertEqual(response.json, {
-#             "data":{
-#                 "classSize": 10,
-#                 "courseClassId": 1,
-#                 "courseId": 1,
-#                 "endDateTime": 'Sat, 09 Oct 2021 00:00:00 GMT',
-#                 "learnerIds": {'b': 0, 'c': 1},
-#                 "startDateTime": 'Fri, 08 Oct 2021 00:00:00 GMT',
-#                 "trainerId": 1
-#             }
-#         })
+        response = self.client.post("/class/delete/learner",
+                                    data=json.dumps(request_body),
+                                    content_type='application/json')
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.json, {
+            "data":{
+                "classSize": 10,
+                "courseClassId": 1,
+                "courseId": 1,
+                "endDateTime": 'Sat, 09 Oct 2021 00:00:00 GMT',
+                "learnerIds": {'b': 0, 'c': 1},
+                "startDateTime": 'Fri, 08 Oct 2021 00:00:00 GMT',
+                "trainerId": 1
+            }
+        })
 
-#     #test delete learner from non-existent class
-#     def test_delete_learner_from_nonexistent_class(self):
-#         cc1 = CourseClass(courseClassId = 1, courseId = 1, startDateTime = datetime(2021, 10, 8), 
-#                             endDateTime = datetime(2021, 10, 9), learnerIds = {'a': 1, 'b': 0, 'c': 1},
-#                             trainerId = 1, classSize = 10)
-#         db.session.add(cc1)
-#         db.session.commit()
+    #test delete learner from non-existent class
+    def test_delete_learner_from_nonexistent_class(self):
+        cc1 = CourseClass(courseClassId = 1, courseId = 1, startDateTime = datetime(2021, 10, 8), 
+                            endDateTime = datetime(2021, 10, 9), learnerIds = "{'a': 1, 'b': 0, 'c': 1}",
+                            trainerId = 1, classSize = 10)
+        db.session.add(cc1)
+        db.session.commit()
 
-#         request_body = {
-#             "courseClassId": 2,
-#             "learnerId": 'a'
-#         }
+        request_body = {
+            "courseClassId": 2,
+            "learnerId": 'a'
+        }
 
-#         response = self.client.post("/class/delete/learner",
-#                                     data=json.dumps(request_body),
-#                                     content_type='application/json')
-#         self.assertEqual(response.status_code, 404)
-#         self.assertEqual(response.json, {
-#             "message": "This class does not exist."
-#         })
+        response = self.client.post("/class/delete/learner",
+                                    data=json.dumps(request_body),
+                                    content_type='application/json')
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.json, {
+            "message": "This class does not exist."
+        })
 
-#     #test delete non-existent learner from class
-#     def test_delete_nonexistent_learner_from_class(self):
-#         cc1 = CourseClass(courseClassId = 1, courseId = 1, startDateTime = datetime(2021, 10, 8), 
-#                             endDateTime = datetime(2021, 10, 9), learnerIds = {'a': 1, 'b': 0, 'c': 1},
-#                             trainerId = 1, classSize = 10)
-#         db.session.add(cc1)
-#         db.session.commit()
+    #test delete non-existent learner from class
+    def test_delete_nonexistent_learner_from_class(self):
+        cc1 = CourseClass(courseClassId = 1, courseId = 1, startDateTime = datetime(2021, 10, 8), 
+                            endDateTime = datetime(2021, 10, 9), learnerIds = "{'a': 1, 'b': 0, 'c': 1}",
+                            trainerId = 1, classSize = 10)
+        db.session.add(cc1)
+        db.session.commit()
 
-#         request_body = {
-#             "courseClassId": 1,
-#             "learnerId": 'd'
-#         }
+        request_body = {
+            "courseClassId": 1,
+            "learnerId": 'd'
+        }
 
-#         response = self.client.post("/class/delete/learner",
-#                                     data=json.dumps(request_body),
-#                                     content_type='application/json')
-#         self.assertEqual(response.status_code, 404)
-#         self.assertEqual(response.json, {
-#             "message": "Learner is not in this class."
-#         })
+        response = self.client.post("/class/delete/learner",
+                                    data=json.dumps(request_body),
+                                    content_type='application/json')
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.json, {
+            "message": "Learner is not in this class."
+        })
 
 if __name__ == '__main__':
     unittest.main()

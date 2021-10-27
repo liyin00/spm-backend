@@ -418,7 +418,7 @@ def cancel_learner():
         ), 404
 
     class_info = CourseClass.query.filter_by(courseClassId=data['courseClassId']).first()
-    new_dict = dict(class_info.learnerIds) #pickletype is not mutable unless you assign it onto another variable
+    new_dict = CourseClass.change_to_dict(class_info)
     if not(id in new_dict):
         return jsonify(
             {
@@ -427,7 +427,7 @@ def cancel_learner():
         ), 404
 
     del new_dict[id]
-    class_info.learnerIds = new_dict
+    class_info.learnerIds = str(new_dict)
 
     try:
         db.session.commit()
@@ -438,6 +438,7 @@ def cancel_learner():
             }
         ), 500
 
+    class_info.learnerIds = CourseClass.change_to_dict(class_info)
     return jsonify(
         {
             "data": class_info.json()
