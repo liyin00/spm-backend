@@ -38,7 +38,7 @@ class CourseClass(db.Model):
     courseId = db.Column(db.Integer(), nullable=False)
     startDateTime = db.Column(db.DateTime(), nullable=True)
     endDateTime = db.Column(db.DateTime(), nullable=True)
-    learnerIds = db.Column(db.String(999), nullable=True)
+    learnerIds = db.Column(db.String(999), nullable=False) #if it is empty, insert an empty dict
     trainerId = db.Column(db.Integer(), nullable=True)
     classSize = db.Column(db.Integer(), nullable=True)
 
@@ -230,6 +230,8 @@ def update_by_courseId():
 @app.route("/class/<int:courseId>", methods=['GET'])
 def find_class_by_CourseID(courseId):
     course_classes = CourseClass.query.filter_by(courseId=courseId).all()
+    for class_info in course_classes:
+        class_info.learnerIds = CourseClass.change_to_dict(class_info)
     if course_classes:
         return jsonify(
             {

@@ -23,42 +23,42 @@ class TestApp(flask_testing.TestCase):
 
 
 class TestCourseClasses(TestApp):
-    # #test searching classes by courseId
-    # def test_searching_classes(self):
-    #     cc1 = CourseClass(courseId = 1, startDateTime = datetime(2021, 10, 8), 
-    #                         endDateTime = datetime(2021, 10, 9), learnerIds = "{'a': 1, 'b': 0, 'c': 1}",
-    #                         trainerId = 1, classSize = 10)
-    #     cc2 = CourseClass(courseId = 1)
-    #     db.session.add(cc1)
-    #     db.session.add(cc2)
-    #     db.session.commit()
+    #test searching classes by courseId
+    def test_searching_classes(self):
+        cc1 = CourseClass(courseId = 1, startDateTime = datetime(2021, 10, 8), 
+                            endDateTime = datetime(2021, 10, 9), learnerIds = "{'a': 1, 'b': 0, 'c': 1}",
+                            trainerId = 1, classSize = 10)
+        cc2 = CourseClass(courseId = 1, learnerIds = "{}")
+        db.session.add(cc1)
+        db.session.add(cc2)
+        db.session.commit()
 
-    #     response = self.client.get('/class/1')
-    #     self.assertEqual(response.status_code, 200)
-    #     self.assertEqual(response.json, {
-    #         'data':{
-    #             "classes": [
-    #                 {
-    #                     "classSize": 10,
-    #                     "courseClassId": 1,
-    #                     "courseId": 1,
-    #                     "endDateTime": 'Sat, 09 Oct 2021 00:00:00 GMT',
-    #                     "learnerIds": {'a': 1, 'b': 0, 'c': 1},
-    #                     "startDateTime": 'Fri, 08 Oct 2021 00:00:00 GMT',
-    #                     "trainerId": 1
-    #                 },
-    #                 {
-    #                     "classSize": None,
-    #                     "courseClassId": 2,
-    #                     "courseId": 1,
-    #                     "endDateTime": None,
-    #                     "learnerIds": None,
-    #                     "startDateTime": None,
-    #                     "trainerId": None
-    #                 }
-    #             ]
-    #         }
-    #     })
+        response = self.client.get('/class/1')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json, {
+            'data':{
+                "classes": [
+                    {
+                        "classSize": 10,
+                        "courseClassId": 1,
+                        "courseId": 1,
+                        "endDateTime": 'Sat, 09 Oct 2021 00:00:00 GMT',
+                        "learnerIds": {'a': 1, 'b': 0, 'c': 1},
+                        "startDateTime": 'Fri, 08 Oct 2021 00:00:00 GMT',
+                        "trainerId": 1
+                    },
+                    {
+                        "classSize": None,
+                        "courseClassId": 2,
+                        "courseId": 1,
+                        "endDateTime": None,
+                        "learnerIds": {},
+                        "startDateTime": None,
+                        "trainerId": None
+                    }
+                ]
+            }
+        })
 
 #     #test searching non-existent classes by courseId
 #     def test_searching_empty_classes(self):
