@@ -230,9 +230,9 @@ def update_by_courseId():
 @app.route("/class/<int:courseId>", methods=['GET'])
 def find_class_by_CourseID(courseId):
     course_classes = CourseClass.query.filter_by(courseId=courseId).all()
-    for class_info in course_classes:
-        class_info.learnerIds = CourseClass.change_to_dict(class_info)
     if course_classes:
+        for class_info in course_classes:
+            class_info.learnerIds = CourseClass.change_to_dict(class_info)
         return jsonify(
             {
                 "data": {
@@ -272,7 +272,7 @@ def create_class():
                 "message": "An error occurred when creating the class."
             }
         ), 500
-
+    class_info.learnerIds = CourseClass.change_to_dict(class_info)
     return jsonify(
         {
             "data": class_info.json()

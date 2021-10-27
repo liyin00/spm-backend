@@ -60,77 +60,77 @@ class TestCourseClasses(TestApp):
             }
         })
 
-#     #test searching non-existent classes by courseId
-#     def test_searching_empty_classes(self):
-#         cc1 = CourseClass(courseId = 1, startDateTime = datetime(2021, 10, 8), 
-#                             endDateTime = datetime(2021, 10, 9), learnerIds = {'a': 1, 'b': 0, 'c': 1},
-#                             trainerId = 1, classSize = 10)
-#         cc2 = CourseClass(courseId = 1)
-#         db.session.add(cc1)
-#         db.session.add(cc2)
-#         db.session.commit()
+    #test searching non-existent classes by courseId
+    def test_searching_empty_classes(self):
+        cc1 = CourseClass(courseId = 1, startDateTime = datetime(2021, 10, 8), 
+                            endDateTime = datetime(2021, 10, 9), learnerIds = "{'a': 1, 'b': 0, 'c': 1}",
+                            trainerId = 1, classSize = 10)
+        cc2 = CourseClass(courseId = 1, learnerIds = "{}")
+        db.session.add(cc1)
+        db.session.add(cc2)
+        db.session.commit()
 
-#         response = self.client.get('/class/2')
-#         self.assertEqual(response.status_code, 404)
-#         self.assertEqual(response.json, {
-#             'message': "Classes was not found."
-#         })
+        response = self.client.get('/class/2')
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.json, {
+            'message': "Classes was not found."
+        })
 
-#     #test add class
-#     def test_add_class(self):
-#         c1 = Course(courseId = 1, courseName = 'abc', courseDesc = '123',
-#                     prerequisites = "def", isActive = 1)
-#         db.session.add(c1)
-#         db.session.commit()
+    #test add class
+    def test_add_class(self):
+        c1 = Course(courseId = 1, courseName = 'abc', courseDesc = '123',
+                    prerequisites = "def", isActive = 1)
+        db.session.add(c1)
+        db.session.commit()
 
-#         request_body = {
-#             "classSize": 10,
-#             "courseId": 1,
-#             "endDateTime": '09/10/2021',
-#             "learnerIds": {'a': 1, 'b': 0, 'c': 1},
-#             "startDateTime": '08/10/2021',
-#             "trainerId": 1
-#         }
+        request_body = {
+            "classSize": 10,
+            "courseId": 1,
+            "endDateTime": '09/10/2021',
+            "learnerIds": {'a': 1, 'b': 0, 'c': 1},
+            "startDateTime": '08/10/2021',
+            "trainerId": 1
+        }
 
-#         response = self.client.post("/class/add",
-#                                     data=json.dumps(request_body),
-#                                     content_type='application/json')
-#         self.assertEqual(response.status_code, 201)
-#         self.assertEqual(response.json, {
-#             "data":{
-#                 "classSize": 10,
-#                 "courseClassId": 1,
-#                 "courseId": 1,
-#                 "endDateTime": 'Sat, 09 Oct 2021 00:00:00 GMT',
-#                 "learnerIds": {'a': 1, 'b': 0, 'c': 1},
-#                 "startDateTime": 'Fri, 08 Oct 2021 00:00:00 GMT',
-#                 "trainerId": 1
-#             }
-#         })
+        response = self.client.post("/class/add",
+                                    data=json.dumps(request_body),
+                                    content_type='application/json')
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.json, {
+            "data":{
+                "classSize": 10,
+                "courseClassId": 1,
+                "courseId": 1,
+                "endDateTime": 'Sat, 09 Oct 2021 00:00:00 GMT',
+                "learnerIds": {'a': 1, 'b': 0, 'c': 1},
+                "startDateTime": 'Fri, 08 Oct 2021 00:00:00 GMT',
+                "trainerId": 1
+            }
+        })
 
-#     #test add class when course do not exist
-#     def test_add_class_no_course(self):
-#         c1 = Course(courseId = 1, courseName = 'abc', courseDesc = '123',
-#                     prerequisites = "def", isActive = 1)
-#         db.session.add(c1)
-#         db.session.commit()
+    #test add class when course do not exist
+    def test_add_class_no_course(self):
+        c1 = Course(courseId = 1, courseName = 'abc', courseDesc = '123',
+                    prerequisites = "def", isActive = 1)
+        db.session.add(c1)
+        db.session.commit()
 
-#         request_body = {
-#             "classSize": 10,
-#             "courseId": 2, #wrong courseId
-#             "endDateTime": '09/10/2021',
-#             "learnerIds": {'a': 1, 'b': 0, 'c': 1},
-#             "startDateTime": '08/10/2021',
-#             "trainerId": 1
-#         }
+        request_body = {
+            "classSize": 10,
+            "courseId": 2, #wrong courseId
+            "endDateTime": '09/10/2021',
+            "learnerIds": {'a': 1, 'b': 0, 'c': 1},
+            "startDateTime": '08/10/2021',
+            "trainerId": 1
+        }
 
-#         response = self.client.post("/class/add",
-#                                     data=json.dumps(request_body),
-#                                     content_type='application/json')
-#         self.assertEqual(response.status_code, 404)
-#         self.assertEqual(response.json, {
-#             "message": "This course does not exist."
-#         })
+        response = self.client.post("/class/add",
+                                    data=json.dumps(request_body),
+                                    content_type='application/json')
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.json, {
+            "message": "This course does not exist."
+        })
 
 #     #test delete class by courseClassId
 #     def test_delete_existing_class(self):
