@@ -3,7 +3,7 @@ from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 from os import environ
-from datetime import datetime
+from datetime import date
 import json
 
 app = Flask(__name__)
@@ -63,9 +63,23 @@ class Lesson(db.Model):
     lessonId = db.Column(db.Integer(), primary_key=True)
     courseClassId = db.Column(db.Integer(), nullable = False)
     lessonName = db.Column(db.String(250), nullable=False)
-    lessonContent = db.Column(db.PickleType(), nullable=True) #db cannot store list NEEDS CHANGE
-    links = db.Column(db.PickleType(), nullable=True) #db cannot store list NEEDS CHANGE
+    lessonContent = db.Column(db.String(999), nullable=True) #db cannot store list NEEDS CHANGE
+    links = db.Column(db.String(999), nullable=True) #db cannot store list NEEDS CHANGE
 
+    def lessonContent_to_list(self):
+        if self.lessonContent == None:
+            return None
+        string = self.lessonContent
+        list = string.split('||')
+        return list
+
+    def links_to_list(self):
+        if self.links == None:
+            return None
+        string = self.links
+        list = string.split(' ')
+        return list
+    
     def json(self):
         return {"lessonId": self.lessonId,
                 "courseClassId": self.courseClassId, 
@@ -260,8 +274,8 @@ def create_class():
     startDate = data['startDateTime'].split('/') #DD/MM/YYYY format
     endDate = data['endDateTime'].split('/') #DD/MM/YYYY format
     learnerIds = data['learnerIds']
-    class_info = CourseClass(courseId=data['courseId'], startDateTime=datetime(int(startDate[2]),int(startDate[1]),int(startDate[0])),
-                        endDateTime=datetime(int(endDate[2]),int(endDate[1]),int(endDate[0])), learnerIds=str(learnerIds), 
+    class_info = CourseClass(courseId=data['courseId'], startDateTime=date(int(startDate[2]),int(startDate[1]),int(startDate[0])),
+                        endDateTime=date(int(endDate[2]),int(endDate[1]),int(endDate[0])), learnerIds=str(learnerIds), 
                         trainerId=data['trainerId'],classSize=data['classSize'])
     try:
         db.session.add(class_info)
@@ -452,6 +466,9 @@ def cancel_learner():
 def find_lesson_by_courseClassId(courseClassId):
     lessons = Lesson.query.filter_by(courseClassId=courseClassId).all()
     if lessons:
+        for lesson_info in lessons:
+            lesson_info.lessonContent = Lesson.lessonContent_to_list(lesson_info)
+            lesson_info.links = Lesson.links_to_list(lesson_info)
         return jsonify(
             {
                 "data": {
