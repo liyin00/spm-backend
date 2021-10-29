@@ -77,7 +77,7 @@ class Lesson(db.Model):
         if self.links == None:
             return None
         string = self.links
-        list = string.split(' ')
+        list = string.split('||')
         return list
     
     def json(self):
@@ -494,7 +494,7 @@ def create_lesson():
             }
         ), 404
     lessonContent_string = '||'.join(data['lessonContent'])
-    links_string = ' '.join(data['links'])
+    links_string = '||'.join(data['links'])
     lesson_info = Lesson(courseClassId = data['courseClassId'], lessonName = data['lessonName'],
                         lessonContent = lessonContent_string, links = links_string)
     try:
