@@ -26,7 +26,7 @@ class TestLessons(TestApp):
     #test search lessons by courseClassId
     def test_search_lessons_by_courseClassId(self):
         l1 = Lesson(courseClassId = 1, lessonName = 'abc',
-                    lessonContent = "abc||123||lol", links = "www.google.com www.googledrive.com")
+                    lessonContent = "abc||123||lol", links = "www.google.com||www.googledrive.com")
         l2 = Lesson(courseClassId = 1, lessonName = 'bac')
         db.session.add(l1)
         db.session.add(l2)
@@ -59,7 +59,7 @@ class TestLessons(TestApp):
     #test search invalid courseclassId
     def test_search_lesson_by_invalid_courseClassId(self):
         l1 = Lesson(courseClassId = 1, lessonName = 'abc',
-                    lessonContent = "abc||123||lol", links = "www.google.com www.googledrive.com")
+                    lessonContent = "abc||123||lol", links = "www.google.com||www.googledrive.com")
         l2 = Lesson(courseClassId = 1, lessonName = 'bac')
         db.session.add(l1)
         db.session.add(l2)
@@ -129,7 +129,7 @@ class TestLessons(TestApp):
     #test delete lesson by lessonId
     def test_delete_existing_lesson(self):
         l1 = Lesson(courseClassId = 1, lessonName = 'abc',
-                    lessonContent = "abc||123||lol", links = "www.google.com www.googledrive.com")
+                    lessonContent = "abc||123||lol", links = "www.google.com||www.googledrive.com")
         l2 = Lesson(courseClassId = 1, lessonName = 'bac')
         db.session.add(l1)
         db.session.add(l2)
@@ -144,7 +144,7 @@ class TestLessons(TestApp):
     #test delete lesson that does not exist
     def test_delete_non_existing_lesson(self):
         l1 = Lesson(courseClassId = 1, lessonName = 'abc',
-                    lessonContent = "abc||123||lol", links = "www.google.com www.googledrive.com")
+                    lessonContent = "abc||123||lol", links = "www.google.com||www.googledrive.com")
         l2 = Lesson(courseClassId = 1, lessonName = 'bac')
         db.session.add(l1)
         db.session.add(l2)
