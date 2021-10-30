@@ -6,7 +6,8 @@ from os import environ
 from datetime import date
 import json
 
-app = Flask(__name__)
+application = Flask(__name__)
+app = application
 CORS(app)  
 app.config['CORS_HEADERS'] = 'Content-Type'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root@localhost:3306/lms' #environ.get('dbURL')
