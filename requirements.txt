@@ -1,2 +1,8 @@
 Flask==2.0.1
 DateTime==4.3
+Flask-SQLAlchemy==2.5.1
+mysql-connector==2.2.9
+SQLAlchemy==1.4.26
+Flask-Cors==3.0.10
+Flask-Testing==0.8.1
+virtualenv==20.9.0
