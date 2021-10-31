@@ -1,16 +1,66 @@
-import os
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
-from os import environ
 from datetime import date
 import json
+import boto3
+import base64
+from botocore.exceptions import ClientError
+import boto3 
+import json 
+
+def get_secret():
+    secret_name = 'arn:aws:secretsmanager:us-east-1:216328872487:secret:spmrdsdb-bi1DIg'
+    region_name = 'us-east-1'
+
+    # Create a Secrets Manager client
+    session = boto3.session.Session()
+    client = session.client(
+        service_name='secretsmanager',
+        region_name=region_name,
+        aws_access_key_id='AKIATEXRUUITYYMQBLP4',aws_secret_access_key='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'
+    )
+
+    try:
+        get_secret_value_response = client.get_secret_value(
+            SecretId=secret_name
+        )
+    except ClientError as e:
+        if e.response['Error']['Code'] == 'DecryptionFailureException':
+            raise e
+        elif e.response['Error']['Code'] == 'InternalServiceErrorException':
+            raise e
+        elif e.response['Error']['Code'] == 'InvalidParameterException':
+            raise e
+        elif e.response['Error']['Code'] == 'InvalidRequestException':
+            raise e
+        elif e.response['Error']['Code'] == 'ResourceNotFoundException':
+            raise e
+    else:
+        if 'SecretString' in get_secret_value_response:
+            secret = get_secret_value_response['SecretString']
+            return json.loads(secret)
+        else:
+            secret = base64.b64decode(get_secret_value_response['SecretBinary'])
+            return json.loads(secret)
+
+s = get_secret()
+host = s['host']
+username = s['username']
+password = s['password']
+
+db_url = 'mysql+mysqlconnector://' + username + ':' + password + '@' + host + ':3306/lms'
+
 
 application = Flask(__name__)
 app = application
 CORS(app)  
+
+import os
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://admin:squidgame@myrdsdb.c7qjuvz5dlnv.us-east-1.rds.amazonaws.com:3306/lms'
+#environ.get('dbURL')
 app.config['CORS_HEADERS'] = 'Content-Type'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root@localhost:3306/lms' #environ.get('dbURL')
+app.config['SQLALCHEMY_DATABASE_URI'] = db_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {'pool_recycle': 299}
 

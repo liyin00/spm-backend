@@ -7,6 +7,3 @@ Flask-Cors==3.0.10
 Flask-Testing==0.8.1
 virtualenv==20.9.0
 Django==2.2
-mysqlclient==2.0.3
-boto3==1.19.7
-botocore==1.22.7

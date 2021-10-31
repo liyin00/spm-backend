@@ -1,2 +1,3 @@
 #!/bin/bash
 sudo service httpd start
+python /home/ec2-user/app/lms/lms.py
