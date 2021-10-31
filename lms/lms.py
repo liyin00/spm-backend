@@ -11,14 +11,10 @@ from os import environ
 app = Flask(__name__)
 CORS(app)  
 
-# app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root@localhost:3306/lms' #environ.get('dbURL')
-# app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-# app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {'pool_recycle': 299}
-
-# HOST = "0.0.0.0"
-# PORT = 5002
+import os
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://admin:squidgame@myrdsdb.c7qjuvz5dlnv.us-east-1.rds.amazonaws.com:3306/lms'
+#environ.get('dbURL')
 app.config['CORS_HEADERS'] = 'Content-Type'
-app.config['SQLALCHEMY_DATABASE_URI'] = environ.get('dbURL') 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {'pool_recycle': 299}
 
