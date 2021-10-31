@@ -3,10 +3,6 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 from datetime import date
 import json
-<<<<<<< Updated upstream
-import os
-from os import environ
-=======
 import boto3
 import base64
 from botocore.exceptions import ClientError
@@ -55,7 +51,6 @@ password = s['password']
 
 db_url = 'mysql+mysqlconnector://' + username + ':' + password + '@' + host + ':3306/lms'
 
->>>>>>> Stashed changes
 
 application = Flask(__name__)
 app = application
@@ -65,10 +60,7 @@ import os
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://admin:squidgame@myrdsdb.c7qjuvz5dlnv.us-east-1.rds.amazonaws.com:3306/lms'
 #environ.get('dbURL')
 app.config['CORS_HEADERS'] = 'Content-Type'
-<<<<<<< Updated upstream
-=======
 app.config['SQLALCHEMY_DATABASE_URI'] = db_url
->>>>>>> Stashed changes
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {'pool_recycle': 299}
 
