@@ -26,9 +26,9 @@ class TestCourseClasses(TestApp):
     #test searching classes by courseId
     def test_searching_classes(self):
         cc1 = CourseClass(courseId = 1, startDateTime = datetime(2021, 10, 8), 
-                            endDateTime = datetime(2021, 10, 9), learnerIds = {'a': 1, 'b': 0, 'c': 1},
+                            endDateTime = datetime(2021, 10, 9), learnerIds = "{'a': 1, 'b': 0, 'c': 1}",
                             trainerId = 1, classSize = 10)
-        cc2 = CourseClass(courseId = 1)
+        cc2 = CourseClass(courseId = 1, learnerIds = "{}")
         db.session.add(cc1)
         db.session.add(cc2)
         db.session.commit()
@@ -52,7 +52,7 @@ class TestCourseClasses(TestApp):
                         "courseClassId": 2,
                         "courseId": 1,
                         "endDateTime": None,
-                        "learnerIds": None,
+                        "learnerIds": {},
                         "startDateTime": None,
                         "trainerId": None
                     }
@@ -63,9 +63,9 @@ class TestCourseClasses(TestApp):
     #test searching non-existent classes by courseId
     def test_searching_empty_classes(self):
         cc1 = CourseClass(courseId = 1, startDateTime = datetime(2021, 10, 8), 
-                            endDateTime = datetime(2021, 10, 9), learnerIds = {'a': 1, 'b': 0, 'c': 1},
+                            endDateTime = datetime(2021, 10, 9), learnerIds = "{'a': 1, 'b': 0, 'c': 1}",
                             trainerId = 1, classSize = 10)
-        cc2 = CourseClass(courseId = 1)
+        cc2 = CourseClass(courseId = 1, learnerIds = "{}")
         db.session.add(cc1)
         db.session.add(cc2)
         db.session.commit()
@@ -135,7 +135,7 @@ class TestCourseClasses(TestApp):
     #test delete class by courseClassId
     def test_delete_existing_class(self):
         cc1 = CourseClass(courseClassId = 1, courseId = 1, startDateTime = datetime(2021, 10, 8), 
-                            endDateTime = datetime(2021, 10, 9), learnerIds = {'a': 1, 'b': 0, 'c': 1},
+                            endDateTime = datetime(2021, 10, 9), learnerIds = "{'a': 1, 'b': 0, 'c': 1}",
                             trainerId = 1, classSize = 10)
         db.session.add(cc1)
         db.session.commit()
@@ -149,7 +149,7 @@ class TestCourseClasses(TestApp):
     #test delete class that does not exist
     def test_delete_nonexisting_class(self):
         cc1 = CourseClass(courseClassId = 1, courseId = 1, startDateTime = datetime(2021, 10, 8), 
-                            endDateTime = datetime(2021, 10, 9), learnerIds = {'a': 1, 'b': 0, 'c': 1},
+                            endDateTime = datetime(2021, 10, 9), learnerIds = "{'a': 1, 'b': 0, 'c': 1}",
                             trainerId = 1, classSize = 10)
         db.session.add(cc1)
         db.session.commit()
@@ -163,7 +163,7 @@ class TestCourseClasses(TestApp):
     #test add new learner to class
     def test_add_new_learner(self):
         cc1 = CourseClass(courseClassId = 1, courseId = 1, startDateTime = datetime(2021, 10, 8), 
-                            endDateTime = datetime(2021, 10, 9), learnerIds = {'a': 1, 'b': 0, 'c': 1},
+                            endDateTime = datetime(2021, 10, 9), learnerIds = "{'a': 1, 'b': 0, 'c': 1}",
                             trainerId = 1, classSize = 10)
         db.session.add(cc1)
         db.session.commit()
@@ -192,7 +192,7 @@ class TestCourseClasses(TestApp):
     #test add learner to non-exising class
     def test_add_learner_nonexisting_class(self):
         cc1 = CourseClass(courseClassId = 1, courseId = 1, startDateTime = datetime(2021, 10, 8), 
-                            endDateTime = datetime(2021, 10, 9), learnerIds = {'a': 1, 'b': 0, 'c': 1},
+                            endDateTime = datetime(2021, 10, 9), learnerIds = "{'a': 1, 'b': 0, 'c': 1}",
                             trainerId = 1, classSize = 10)
         db.session.add(cc1)
         db.session.commit()
@@ -211,9 +211,9 @@ class TestCourseClasses(TestApp):
         })
 
     #test add existing learner to class
-    def test_add_learner_nonexisting_class(self):
+    def test_add_existing_learner_to_class(self):
         cc1 = CourseClass(courseClassId = 1, courseId = 1, startDateTime = datetime(2021, 10, 8), 
-                            endDateTime = datetime(2021, 10, 9), learnerIds = {'a': 1, 'b': 0, 'c': 1},
+                            endDateTime = datetime(2021, 10, 9), learnerIds = "{'a': 1, 'b': 0, 'c': 1}",
                             trainerId = 1, classSize = 10)
         db.session.add(cc1)
         db.session.commit()
@@ -234,7 +234,7 @@ class TestCourseClasses(TestApp):
     #test accept new learner to class
     def test_accept_new_learner(self):
         cc1 = CourseClass(courseClassId = 1, courseId = 1, startDateTime = datetime(2021, 10, 8), 
-                            endDateTime = datetime(2021, 10, 9), learnerIds = {'a': 1, 'b': 0, 'c': 1, 'd': 0},
+                            endDateTime = datetime(2021, 10, 9), learnerIds = "{'a': 1, 'b': 0, 'c': 1, 'd': 0}",
                             trainerId = 1, classSize = 10)
         db.session.add(cc1)
         db.session.commit()
@@ -263,7 +263,7 @@ class TestCourseClasses(TestApp):
     #test accept learner to non-exising class
     def test_accept_learner_nonexisting_class(self):
         cc1 = CourseClass(courseClassId = 1, courseId = 1, startDateTime = datetime(2021, 10, 8), 
-                            endDateTime = datetime(2021, 10, 9), learnerIds = {'a': 1, 'b': 0, 'c': 1, 'd': 0},
+                            endDateTime = datetime(2021, 10, 9), learnerIds = "{'a': 1, 'b': 0, 'c': 1, 'd': 0}",
                             trainerId = 1, classSize = 10)
         db.session.add(cc1)
         db.session.commit()
@@ -284,7 +284,7 @@ class TestCourseClasses(TestApp):
     #test add new trainer to class
     def test_add_new_trainer(self):
         cc1 = CourseClass(courseClassId = 1, courseId = 1, startDateTime = datetime(2021, 10, 8), 
-                            endDateTime = datetime(2021, 10, 9), learnerIds = {'a': 1, 'b': 0, 'c': 1},
+                            endDateTime = datetime(2021, 10, 9), learnerIds = "{'a': 1, 'b': 0, 'c': 1}",
                             trainerId = 1, classSize = 10)
         db.session.add(cc1)
         db.session.commit()
@@ -313,7 +313,7 @@ class TestCourseClasses(TestApp):
     #test add new trainer to non-existing class
     def test_add_trainer_nonexisting_class(self):
         cc1 = CourseClass(courseClassId = 1, courseId = 1, startDateTime = datetime(2021, 10, 8), 
-                            endDateTime = datetime(2021, 10, 9), learnerIds = {'a': 1, 'b': 0, 'c': 1},
+                            endDateTime = datetime(2021, 10, 9), learnerIds = "{'a': 1, 'b': 0, 'c': 1}",
                             trainerId = 1, classSize = 10)
         db.session.add(cc1)
         db.session.commit()
@@ -334,7 +334,7 @@ class TestCourseClasses(TestApp):
     #test delete existing learner from class
     def test_delete_learner_from_class(self):
         cc1 = CourseClass(courseClassId = 1, courseId = 1, startDateTime = datetime(2021, 10, 8), 
-                            endDateTime = datetime(2021, 10, 9), learnerIds = {'a': 1, 'b': 0, 'c': 1},
+                            endDateTime = datetime(2021, 10, 9), learnerIds = "{'a': 1, 'b': 0, 'c': 1}",
                             trainerId = 1, classSize = 10)
         db.session.add(cc1)
         db.session.commit()
@@ -360,10 +360,10 @@ class TestCourseClasses(TestApp):
             }
         })
 
-#test delete learner from non-existent class
+    #test delete learner from non-existent class
     def test_delete_learner_from_nonexistent_class(self):
         cc1 = CourseClass(courseClassId = 1, courseId = 1, startDateTime = datetime(2021, 10, 8), 
-                            endDateTime = datetime(2021, 10, 9), learnerIds = {'a': 1, 'b': 0, 'c': 1},
+                            endDateTime = datetime(2021, 10, 9), learnerIds = "{'a': 1, 'b': 0, 'c': 1}",
                             trainerId = 1, classSize = 10)
         db.session.add(cc1)
         db.session.commit()
@@ -384,7 +384,7 @@ class TestCourseClasses(TestApp):
     #test delete non-existent learner from class
     def test_delete_nonexistent_learner_from_class(self):
         cc1 = CourseClass(courseClassId = 1, courseId = 1, startDateTime = datetime(2021, 10, 8), 
-                            endDateTime = datetime(2021, 10, 9), learnerIds = {'a': 1, 'b': 0, 'c': 1},
+                            endDateTime = datetime(2021, 10, 9), learnerIds = "{'a': 1, 'b': 0, 'c': 1}",
                             trainerId = 1, classSize = 10)
         db.session.add(cc1)
         db.session.commit()
