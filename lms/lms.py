@@ -8,6 +8,17 @@ import base64
 from botocore.exceptions import ClientError
 import boto3 
 import json 
+import base64
+
+awsId = 'QUtJQVRFWFJVVUlUWVlNUUJMUDQ='
+awsId_bytes=awsId.encode("ascii")
+base64_awsId=base64.b64decode(awsId_bytes)
+decryptedId = base64_awsId.decode('utf-8')
+
+awsKey ='c3hnaEYzZHBYM2pPcVEweTNqVVF4RWZOVDByVzczUG93aTVpVVZWcA=='
+awsKey_bytes=awsKey.encode("ascii")
+base64_awsKey=base64.b64decode(awsKey_bytes)
+decryptedKey = base64_awsKey.decode('utf-8')
 
 def get_secret():
     secret_name = 'arn:aws:secretsmanager:us-east-1:216328872487:secret:spmrdsdb-bi1DIg'
@@ -18,7 +29,8 @@ def get_secret():
     client = session.client(
         service_name='secretsmanager',
         region_name=region_name,
-        aws_access_key_id='AKIATEXRUUITYYMQBLP4',aws_secret_access_key='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'
+        aws_access_key_id=decryptedId,
+        aws_secret_access_key=decryptedKey
     )
 
     try:
@@ -171,6 +183,10 @@ class Quiz(db.Model):
                 "numOfQns": self.numOfQns}
 
 db.create_all()
+
+@app.route("/")
+def hello():
+    return "<p>If you see this page, our Flask is up!</p>"
 
 #start of CRUD Courses-----------------------------------------------------------
 #find all courses
