@@ -1,4 +1,0 @@
-#!/bin/bash
-sudo yum install -y httpd mod_wsgi.x86_64
-pip install -r /home/ec2-user/app/requirements.txt
-
