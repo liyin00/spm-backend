@@ -70,6 +70,7 @@ create table quiz
     isGraded boolean NULL,
     passingMark int NULL,
     numOfQns int NULL,
+    quizLink varchar(999) NULL,
     PRIMARY KEY (quizId),
     FOREIGN KEY fk1 (lessonId) REFERENCES lesson(lessonId)
 );
