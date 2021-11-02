@@ -30,7 +30,8 @@ class TestQuizzes(TestApp):
             "lessonId":  1,
             "isGraded": 1,
             "passingMark": 5,
-            "numOfQns": 10
+            "numOfQns": 10,
+            "quizLink": "https://quiz-maker.com/1"
         }
 
         response = self.client.post("/quiz/add",
@@ -43,14 +44,15 @@ class TestQuizzes(TestApp):
                 "lessonId": 1,
                 "isGraded": 1,
                 "passingMark": 5,
-                "numOfQns": 10
+                "numOfQns": 10,
+                "quizLink": "https://quiz-maker.com/1"
             }
         })
 
     #test view/read quiz
     def test_view_quiz_by_quizId(self):
         q1 = Quiz(quizId = 1, lessonId = 1, isGraded = 1,
-                    passingMark = 5, numOfQns = 10)
+                    passingMark = 5, numOfQns = 10, quizLink = "https://quiz-maker.com/1")
         db.session.add(q1)
         db.session.commit()
 
@@ -63,14 +65,15 @@ class TestQuizzes(TestApp):
                 "lessonId": 1,
                 "isGraded": 1,
                 "passingMark": 5,
-                "numOfQns": 10
+                "numOfQns": 10,
+                "quizLink": "https://quiz-maker.com/1"
             }
         })
     
     #test delete quiz 
     def test_delete_quiz(self):
         q1 = Quiz(quizId = 1, lessonId = 1, isGraded = 1,
-                    passingMark = 5, numOfQns = 10)
+                    passingMark = 5, numOfQns = 10, quizLink = "https://quiz-maker.com/1")
         db.session.add(q1)
         db.session.commit()
 
@@ -82,8 +85,8 @@ class TestQuizzes(TestApp):
     
     #test update existing quiz
     def test_update_quiz(self):
-        q1 = Quiz(lessonId = 1, isGraded = 1,
-                    passingMark = 5, numOfQns = 10)
+        q1 = Quiz(quizId = 1, lessonId = 1, isGraded = 1,
+                    passingMark = 5, numOfQns = 10, quizLink = "https://quiz-maker.com/1")
         db.session.add(q1)
         db.session.commit()
 
@@ -92,7 +95,8 @@ class TestQuizzes(TestApp):
             "lessonId": 1,
             "isGraded": 1,
             "passingMark": 7,
-            "numOfQns": 14
+            "numOfQns": 14,
+            "quizLink": "https://quiz-maker.com/1"
         }
 
         response = self.client.post("/quiz/update",
@@ -105,7 +109,8 @@ class TestQuizzes(TestApp):
                 "lessonId": 1,
                 "isGraded": 1,
                 "passingMark": 7,
-                "numOfQns": 14
+                "numOfQns": 14,
+                "quizLink": "https://quiz-maker.com/1"
             }
         })
 
