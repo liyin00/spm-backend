@@ -1,8 +1,0 @@
-buildjob:
-  stage: build
-  tags: 
-    - spmbackend
-  scripts:
-    - docker build -t lingliyin/spm-backend:latest
-    - docker image push lingliyin/spm-backend:latest
-    - aws ecs update-service -cluster spm-backend-cluster -service spm-backend-service --force-new-deployment
