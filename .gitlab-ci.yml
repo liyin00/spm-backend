@@ -1,7 +1,7 @@
 build-job: 
   stage: build
   tags: 
-    - spmbackend
+    - spm-backend
   script:
     - docker build -t lingliyin/spm-backend:latest
     - docker image push lingliyin/spm-backend:latest
