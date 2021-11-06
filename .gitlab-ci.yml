@@ -1,9 +1,4 @@
-image: python:latest
-
-stages:
-    - build
-    - test
-    - deploy
+image: python:3
 
 cache:
   paths:
@@ -14,7 +9,13 @@ before_script:
   - pip install virtualenv
   - virtualenv .venv
   - source .venv/bin/activate
+  - apt-get install -y python-pip 
   - pip install -r requirements.txt
+
+stages:
+    - build
+    - test
+    - deploy
 
 docker-build:
   stage: build
