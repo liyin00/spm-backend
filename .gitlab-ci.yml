@@ -1,4 +1,9 @@
-build-job: 
+stages:
+    - build
+    - test
+    - deploy
+
+docker-build:
   stage: build
   tags: 
     - spm-backend
@@ -6,6 +11,7 @@ build-job:
     - docker build -t lingliyin/spm-backend:latest .
     - docker image push lingliyin/spm-backend:latest
 
+scripts-test:
   stage: test 
   script: 
     - python lms/classes_integration_test.py
@@ -13,6 +19,7 @@ build-job:
     - python lms/lessons_integration_test.py
     - python lms/users_integration_test.py
 
+deploy-ecs:
   stage: deploy 
   rules: 
     - if: '$CI_COMMIT_REF_NAME == "SPMG6T9-75-cicd"'
