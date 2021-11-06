@@ -1,14 +1,4 @@
-image: python:3
-
-cache:
-  paths:
-    - .venv/
-
 before_script:
-  - python -V  # Print out python version for debugging
-  - pip install virtualenv
-  - virtualenv .venv
-  - source .venv/bin/activate
   - apt-get install -y python-pip 
   - pip install -r requirements.txt
 
