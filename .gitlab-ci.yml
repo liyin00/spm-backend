@@ -8,9 +8,8 @@ docker-build:
   tags: 
     - spm-backend
   script:
-    - docker build -t spm-backend:latest .
-    - docker tag spm-backend:latest lingliyin/spm-backend:latest
-    - docker image push lingliyin/spm-backend:latest
+    - docker build -t registry.gitlab.com/liyin001/spm-backend .
+    - docker push registry.gitlab.com/liyin001/spm-backend
 
 scripts-test:
   stage: test 
