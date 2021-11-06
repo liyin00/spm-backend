@@ -1,7 +1,6 @@
 import unittest
 import flask_testing
 import json
-from datetime import datetime
 from lms import app, db, Course
 
 class TestApp(flask_testing.TestCase):
