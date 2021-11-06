@@ -17,5 +17,5 @@ build-job:
   rules: 
     - if: '$CI_COMMIT_REF_NAME == "SPMG6T9-75-cicd"'
   script: 
-    - ecs update-task-definition
+    - aws ecs update-task-definition
     # - aws ecs update-service --cluster spm-backend-cluster --service spm-backend-service --force-new-deployment
