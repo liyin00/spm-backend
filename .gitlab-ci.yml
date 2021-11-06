@@ -2,10 +2,10 @@
 #   - apt-get install -y python-pip 
 #   - pip install -r requirements.txt
 
-stages:
-    - build
-    - test
-    - deploy
+# stages:
+#     - build
+#     - test
+#     - deploy
 
 docker-build:
   stage: build
@@ -25,11 +25,11 @@ docker-build:
 #     - python lessons_integration_test.py
 #     - python users_integration_test.py
 
-deploy-ecs:
-  stage: deploy 
-  rules: 
-    - if: '$CI_COMMIT_REF_NAME == "SPMG6T9-75-cicd"'
-  script: 
-    # - aws ecs update-task-definition
-    - aws ecs update-service --cluster liyin-spm --service spm-backend --force-new-deployment
+# deploy-ecs:
+#   stage: deploy 
+#   rules: 
+#     - if: '$CI_COMMIT_REF_NAME == "SPMG6T9-75-cicd"'
+#   script: 
+#     # - aws ecs update-task-definition
+#     - aws ecs update-service --cluster liyin-spm --service spm-backend --force-new-deployment
     # - aws ecs update-service --force-new-deployment
