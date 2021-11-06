@@ -15,10 +15,10 @@ docker-build:
 scripts-test:
   stage: test 
   script: 
-    - python lms/classes_integration_test.py
-    - python lms/courses_integration_test.py
-    - python lms/lessons_integration_test.py
-    - python lms/users_integration_test.py
+    - python classes_integration_test.py
+    - python courses_integration_test.py
+    - python lessons_integration_test.py
+    - python users_integration_test.py
 
 deploy-ecs:
   stage: deploy 
