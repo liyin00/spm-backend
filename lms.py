@@ -127,6 +127,7 @@ class Quiz(db.Model):
     passingMark = db.Column(db.Integer(), nullable=True)
     numOfQns = db.Column(db.Integer(), nullable=True)
     quizLink = db.Column(db.String(999), nullable=True)
+    isActive = db.Column(db.String(999), nullable=False)
 
     def json(self):
         return {"quizId": self.quizId, 
@@ -134,7 +135,8 @@ class Quiz(db.Model):
                 "isGraded": self.isGraded, 
                 "passingMark": self.passingMark, 
                 "numOfQns": self.numOfQns,
-                "quizLink": self.quizLink}
+                "quizLink": self.quizLink,
+                "isActive": self.isActive}
 
 db.create_all()
 
@@ -714,7 +716,8 @@ def create_quiz():
                         isGraded=data['isGraded'],
                         passingMark=data['passingMark'], 
                         numOfQns=data['numOfQns'],
-                        quizLink=data['quizLink'])
+                        quizLink=data['quizLink'],
+                        isActive=data['isActive'])
     try:
         db.session.add(quiz_info)
         db.session.commit()
@@ -784,6 +787,7 @@ def update_by_quizId():
     quiz_info.passingMark = data['passingMark']
     quiz_info.numOfQns = data['numOfQns']
     quiz_info.quizLink = data['quizLink']
+    quiz_info.isActive = data['isActive']
     try:
         db.session.commit()
     except:
