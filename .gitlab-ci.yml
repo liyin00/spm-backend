@@ -5,4 +5,17 @@ build-job:
   script:
     - docker build -t lingliyin/spm-backend:latest .
     - docker image push lingliyin/spm-backend:latest
-    - aws ecs update-service --cluster spm-backend-cluster --service spm-backend-service --force-new-deployment
+
+  stage: test 
+  script: 
+    - python lms/classes_integration_test.py
+    - python lms/courses_integration_test.py
+    - python lms/lessons_integration_test.py
+    - python lms/users_integration_test.py
+
+  stage: deploy 
+  rules: 
+    - if: '$CI_COMMIT_REF_NAME == "SPMG6T9-75-cicd"'
+  script: 
+    - ecs update-task-definition
+    # - aws ecs update-service --cluster spm-backend-cluster --service spm-backend-service --force-new-deployment
