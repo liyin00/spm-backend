@@ -8,10 +8,8 @@ docker-build:
   tags: 
     - spm-backend
   script:
-    - docker login -u lingliyin
     - docker build -t spm-backend:latest .
     - docker tag spm-backend:latest lingliyin/spm-backend:latest
-    - docker tag mylocalimage:latest sirimalla/dockerhub:myfirstimagepush
     - docker image push lingliyin/spm-backend:latest
 
 scripts-test:
