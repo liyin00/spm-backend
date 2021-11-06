@@ -4,6 +4,17 @@ from flask_cors import CORS
 from datetime import date
 import json
 import json 
+import base64
+
+awsId = 'QUtJQVRFWFJVVUlUWVlNUUJMUDQ='
+awsId_bytes=awsId.encode("ascii")
+base64_awsId=base64.b64decode(awsId_bytes)
+decryptedId = base64_awsId.decode('utf-8')
+
+awsKey ='c3hnaEYzZHBYM2pPcVEweTNqVVF4RWZOVDByVzczUG93aTVpVVZWcA=='
+awsKey_bytes=awsKey.encode("ascii")
+base64_awsKey=base64.b64decode(awsKey_bytes)
+decryptedKey = base64_awsKey.decode('utf-8')
 
 application = Flask(__name__)
 app = application
