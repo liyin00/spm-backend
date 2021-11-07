@@ -9,13 +9,16 @@ stages:
 
 test: 
   stage: test
-  image: python:latest
+  image: python:3.6
   tags: 
     - spm-backend
   before_script:
-    - pip3 install -r requirements.txt
+    - apt-get update -q -y 
+    - apt-get install -y python-pip 
+    - python -V
+    - pip install -r requirements.txt
   script:
-    - python classes_integration_test.py test
+    - python classes_integration_test.py 
 
 
 build:
