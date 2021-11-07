@@ -256,7 +256,7 @@ class TestUsers(TestApp):
 
 
     #test get user by name
-    def test_get_engineer_by_name(self):
+    def test_get_engineers_by_name(self):
         test_engineer1 = User(name = 'testengineer1', subrole = 'testsubrole1',
                     department = "Engineer", email = "testengineer1@email.com")
         db.session.add(test_engineer1)
@@ -267,16 +267,20 @@ class TestUsers(TestApp):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json, {
             'data':{
-                "name": "testengineer1",
-                "subrole": "testsubrole1",
-                "department": "Engineer",
-                "email": "testengineer1@email.com",
-                "userId": 1
+                [
+                    {
+                        "name": "testengineer1",
+                        "subrole": "testsubrole1",
+                        "department": "Engineer",
+                        "email": "testengineer1@email.com",
+                        "userId": 1
+                    }
+                ]
             },
         })
 
     #test get user by name if user name does not exist in database
-    def test_get_engineer_by_name_invalid(self):
+    def test_get_engineers_by_name_invalid(self):
         test_engineer1 = User(name = 'testengineer1', subrole = 'testsubrole1',
                     department = "Engineer", email = "testengineer1@email.com")
         db.session.add(test_engineer1)
