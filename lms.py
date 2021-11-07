@@ -26,6 +26,9 @@ class Course(db.Model):
     prerequisites = db.Column(db.String(999), nullable=False) #db cannot store list NEEDS CHANGE
     isActive = db.Column(db.Integer(), nullable=False)
 
+    def get_courseName(self):
+        return self.courseName
+
     def json(self):
         return {"courseId": self.courseId, 
                 "courseName": self.courseName, 
@@ -50,6 +53,12 @@ class CourseClass(db.Model):
         new_dict = json.loads(json_acceptable_string)
         return new_dict
     
+    def get_courseId(self):
+        return self.courseId
+
+    def get_trainerId(self):
+        return self.trainerId
+
     def json(self):
         return {"courseClassId": self.courseClassId,
                 "courseId": self.courseId, 
@@ -82,6 +91,9 @@ class Lesson(db.Model):
         list = string.split('||')
         return list
     
+    def get_lessonName(self):
+        return self.lessonName
+
     def json(self):
         return {"lessonId": self.lessonId,
                 "courseClassId": self.courseClassId, 
@@ -97,6 +109,9 @@ class User(db.Model):
     subrole = db.Column(db.String(100), nullable=False)
     department = db.Column(db.String(100), nullable=False)
     email = db.Column(db.String(100), nullable=False)
+
+    def get_name(self):
+        return self.name
 
     def json(self):
         return {"userId": self.userId,
@@ -114,6 +129,10 @@ class Quiz(db.Model):
     passingMark = db.Column(db.Integer(), nullable=True)
     numOfQns = db.Column(db.Integer(), nullable=True)
     quizLink = db.Column(db.String(999), nullable=True)
+    isActive = db.Column(db.String(999), nullable=False)
+
+    def get_lessonId(self):
+        return self.lessonId
 
     def json(self):
         return {"quizId": self.quizId, 
@@ -121,7 +140,8 @@ class Quiz(db.Model):
                 "isGraded": self.isGraded, 
                 "passingMark": self.passingMark, 
                 "numOfQns": self.numOfQns,
-                "quizLink": self.quizLink}
+                "quizLink": self.quizLink,
+                "isActive": self.isActive}
 
 db.create_all()
 
@@ -252,14 +272,27 @@ def update_by_courseId():
 @app.route("/class/<int:courseId>", methods=['GET'])
 def find_class_by_CourseID(courseId):
     course_classes = CourseClass.query.filter_by(courseId=courseId).all()
+    infos = []
     if course_classes:
         for class_info in course_classes:
-            class_info.learnerIds = CourseClass.change_to_dict(class_info)
+            courseId = CourseClass.get_courseId(class_info)
+            course = Course.query.filter_by(courseId=courseId).first()
+            courseName = Course.get_courseName(course)
+            trainerId = CourseClass.get_trainerId(class_info)
+            if trainerId:
+                trainer = User.query.filter_by(userId=trainerId).first()
+                trainerName = User.get_name(trainer)
+            else:
+                trainerName = ''
+            infos.append([courseName, trainerName])
+        for class_info in course_classes:
+            class_info.learnerIds = CourseClass.change_to_dict(class_info)            
         return jsonify(
             {
                 "data": {
-                    "classes": [course_class.json() for course_class in course_classes]
-                }
+                    "classes": [course_class.json() for course_class in course_classes],
+                    "info": infos
+                }  
             }
         ), 200
     return jsonify(
@@ -701,7 +734,8 @@ def create_quiz():
                         isGraded=data['isGraded'],
                         passingMark=data['passingMark'], 
                         numOfQns=data['numOfQns'],
-                        quizLink=data['quizLink'])
+                        quizLink=data['quizLink'],
+                        isActive=data['isActive'])
     try:
         db.session.add(quiz_info)
         db.session.commit()
@@ -721,11 +755,11 @@ def create_quiz():
 #retrieve quiz by quizId
 @app.route("/quiz/<int:quizId>", methods=['GET'])
 def view_quiz_by_quizId(quizId):
-    course = Quiz.query.filter_by(quizId=quizId).first()
-    if course:
+    quiz = Quiz.query.filter_by(quizId=quizId).first()
+    if quiz:
         return jsonify(
             {
-                "data": course.json()
+                "data": quiz.json()
             }
         ), 200
     return jsonify(
@@ -734,8 +768,30 @@ def view_quiz_by_quizId(quizId):
         }
     ), 404
 
+#retrieve quizzes by lessonId
+@app.route("/quiz/lessonId/<int:lessonId>", methods=['GET'])
+def get_quiz_by_lessonId(lessonId):
+    quizzes = Quiz.query.filter_by(lessonId=lessonId).all()
+    lesson = Lesson.query.filter_by(lessonId=lessonId).first()
+    lessonName = Lesson.get_lessonName(lesson)
+    if quizzes:
+        return jsonify(
+            {
+                "data": {
+                    "name": lessonName,
+                    "quizzes": [quiz.json() for quiz in quizzes]
+                }
+            }
+            
+        ), 200
+    return jsonify(
+        {
+            "message": "Quiz is not found."
+        }
+    ), 404
 
-#delete quiz by quiz
+
+#delete quiz by quizId
 @app.route("/quiz/delete/<int:quizId>", methods=['POST'])
 def delete_quiz(quizId):
     quiz = Quiz.query.filter_by(quizId=quizId).first()
@@ -771,6 +827,7 @@ def update_by_quizId():
     quiz_info.passingMark = data['passingMark']
     quiz_info.numOfQns = data['numOfQns']
     quiz_info.quizLink = data['quizLink']
+    quiz_info.isActive = data['isActive']
     try:
         db.session.commit()
     except:
@@ -785,28 +842,6 @@ def update_by_quizId():
             "data": quiz_info.json()
         }
     ), 201
-
-#retrieve quizzes by lessonId
-@app.route("/quiz/lessonId/<int:lessonId>", methods=['GET'])
-def get_quiz_by_lessonId(lessonId):
-    quizzes = Quiz.query.filter_by(lessonId=lessonId).all()
-    lesson = Lesson.query.filter_by(lessonId=lessonId).first()
-    lessonName = Lesson.get_lessonName(lesson)
-    if quizzes:
-        return jsonify(
-            {
-                "data": {
-                    "name": lessonName,
-                    "quizzes": [quiz.json() for quiz in quizzes]
-                }
-            }
-            
-        ), 200
-    return jsonify(
-        {
-            "message": "Quiz is not found."
-        }
-    ), 404
     
 #End of Quiz Crud ----------------------------------
 
