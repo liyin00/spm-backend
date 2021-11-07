@@ -750,8 +750,24 @@ def view_quiz_by_quizId(quizId):
         }
     ), 404
 
+#retrieve quizzes by lessonId
+@app.route("/quiz/<int:lessonId>", methods=['GET'])
+def get_quiz_by_lessonId(lessonId):
+    quiz = Quiz.query.filter_by(lessonId=lessonId).all()
+    if quiz:
+        return jsonify(
+            {
+                "data": quiz.json()
+            }
+        ), 200
+    return jsonify(
+        {
+            "message": "Quiz is not found."
+        }
+    ), 404
 
-#delete quiz by quiz
+
+#delete quiz by quizId
 @app.route("/quiz/delete/<int:quizId>", methods=['POST'])
 def delete_quiz(quizId):
     quiz = Quiz.query.filter_by(quizId=quizId).first()
