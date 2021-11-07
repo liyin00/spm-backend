@@ -55,6 +55,9 @@ class CourseClass(db.Model):
     
     def get_courseId(self):
         return self.courseId
+    
+    def get_learnerIds(self):
+        return self.learnerIds
 
     def get_trainerId(self):
         return self.trainerId
@@ -267,7 +270,41 @@ def update_by_courseId():
     ), 201
 #end of CRUD courses--------------------------------------------------------------------------
 
-#start of CRUD Classes------------------------------------------------------------------------
+#start of CRUD Classes------------------------------------------------------------------------   
+
+# find classes based on trainerId 
+@app.route("/class/<int:trainerId>", methods=['GET'])
+def find_class_by_trainerID(trainerId):
+    course_classes = CourseClass.query.filter_by(trainerId=trainerId).all()
+    infos = []
+    if course_classes:
+        for class_info in course_classes:
+            courseId = CourseClass.get_courseId(class_info)
+            course = Course.query.filter_by(courseId=courseId).first()
+            courseName = Course.get_courseName(course)
+            trainerId = CourseClass.get_trainerId(class_info)
+            if trainerId:
+                trainer = User.query.filter_by(userId=trainerId).first()
+                trainerName = User.get_name(trainer)
+            else:
+                trainerName = ''
+            infos.append([courseName, trainerName])
+        for class_info in course_classes:
+            class_info.learnerIds = CourseClass.change_to_dict(class_info)            
+        return jsonify(
+            {
+                "data": {
+                    "classes": [course_class.json() for course_class in course_classes],
+                    "info": infos
+                }  
+            }
+        ), 200
+    return jsonify(
+        {
+            "message": "Trainer has no classes."
+        }
+    ), 404              
+    
 #find class based on courseId
 @app.route("/class/<int:courseId>", methods=['GET'])
 def find_class_by_CourseID(courseId):
