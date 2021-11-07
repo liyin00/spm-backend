@@ -721,7 +721,7 @@ def get_engineers_by_name(name):
     if engineers:
         return jsonify(
             {
-                "data": engineers.json()
+                "data": [engineer.json() for engineer in engineers]
             }
         ), 200
     return jsonify(
