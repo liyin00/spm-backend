@@ -11,7 +11,7 @@ test:
   stage: test
   image: python:3.6
   tags: 
-    - github-org
+    - gitlab-org
   before_script:
     - apt-get update -q -y 
     - apt-get install -y python3-pip 
