@@ -52,7 +52,7 @@ class CourseClass(db.Model):
         json_acceptable_string = string.replace("'", "\"")
         new_dict = json.loads(json_acceptable_string)
         return new_dict
-    
+        
     def get_courseId(self):
         return self.courseId
     
@@ -304,7 +304,56 @@ def find_class_by_trainerID(trainerId):
             "message": "Trainer has no classes."
         }
     ), 404              
-    
+
+
+# find classes based on courseClassId 
+@app.route("/class/<int:courseClassId>", methods=['GET'])
+def find_by_classID(courseClassId):
+    course_class = CourseClass.query.filter_by(courseClassId=courseClassId).all()
+    if course_class:
+        return jsonify(
+            {
+                "data": course_class.json()
+            }
+        ), 200
+    return jsonify(
+        {
+            "message": "No such class with this ID."
+        }
+        
+    ), 404
+# def find_class_by_classID(courseClassId):
+#     course_classes = CourseClass.query.filter_by(courseClassId=courseClassId).all()
+#     infos = []
+#     if course_classes:
+#         for class_info in course_classes:
+#             courseId = CourseClass.get_courseId(class_info)
+#             course = Course.query.filter_by(courseId=courseId).first()
+#             courseName = Course.get_courseName(course)
+#             trainerId = CourseClass.get_trainerId(class_info)
+#             if trainerId:
+#                 trainer = User.query.filter_by(userId=trainerId).first()
+#                 trainerName = User.get_name(trainer)
+#             else:
+#                 trainerName = ''
+#             infos.append([courseName, trainerName])
+#         for class_info in course_classes:
+#             class_info.learnerIds = CourseClass.change_to_dict(class_info)            
+#         return jsonify(
+#             {
+#                 "data": {
+#                     "classes": [course_class.json() for course_class in course_classes],
+#                     "info": infos
+#                 }  
+#             }
+#         ), 200
+#     return jsonify(
+#         {
+#             "message": "No such class with this ID."
+#         }
+#     ), 404              
+
+
 #find class based on courseId
 @app.route("/class/<int:courseId>", methods=['GET'])
 def find_class_by_CourseID(courseId):
