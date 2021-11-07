@@ -104,6 +104,9 @@ class Lesson(db.Model):
         list = string.split('||')
         return list
     
+    def get_lessonName(self):
+        return self.lessonName
+
     def json(self):
         return {"lessonId": self.lessonId,
                 "courseClassId": self.courseClassId, 
@@ -140,6 +143,9 @@ class Quiz(db.Model):
     numOfQns = db.Column(db.Integer(), nullable=True)
     quizLink = db.Column(db.String(999), nullable=True)
     isActive = db.Column(db.String(999), nullable=False)
+
+    def get_lessonId(self):
+        return self.lessonId
 
     def json(self):
         return {"quizId": self.quizId, 
@@ -779,10 +785,13 @@ def view_quiz_by_quizId(quizId):
 @app.route("/quiz/lessonId/<int:lessonId>", methods=['GET'])
 def get_quiz_by_lessonId(lessonId):
     quizzes = Quiz.query.filter_by(lessonId=lessonId).all()
+    lesson = Lesson.query.filter_by(lessonId=lessonId).first()
+    lessonName = Lesson.get_lessonName(lesson)
     if quizzes:
         return jsonify(
             {
                 "data": {
+                    "name": lessonName,
                     "quizzes": [quiz.json() for quiz in quizzes]
                 }
             }
