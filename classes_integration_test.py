@@ -2,7 +2,7 @@ import unittest
 import flask_testing
 import json
 from datetime import datetime
-from lms import app, db, CourseClass, Course
+from lms import app, db, CourseClass, Course, User
 
 class TestApp(flask_testing.TestCase):
     app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite://"
@@ -24,6 +24,12 @@ class TestApp(flask_testing.TestCase):
 class TestCourseClasses(TestApp):
     #test searching classes by courseId
     def test_searching_classes(self):
+        c1 = Course(courseId = 1, courseName = 'abc', courseDesc = '123',
+                    prerequisites = "def", isActive = 1)
+        db.session.add(c1)
+        test_user1 = User(name = 'testuser1', subrole = 'testsubrole1',
+                    department = "testdepartment1", email = "testuser1@email.com")
+        db.session.add(test_user1)
         cc1 = CourseClass(courseId = 1, startDateTime = datetime(2021, 10, 8), 
                             endDateTime = datetime(2021, 10, 9), learnerIds = "{'a': 1, 'b': 0, 'c': 1}",
                             trainerId = 1, classSize = 10)
@@ -55,7 +61,8 @@ class TestCourseClasses(TestApp):
                         "startDateTime": None,
                         "trainerId": None
                     }
-                ]
+                ],
+                "info": [['abc', 'testuser1'], ['abc', '']]
             }
         })
 
