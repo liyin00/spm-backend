@@ -751,14 +751,17 @@ def view_quiz_by_quizId(quizId):
     ), 404
 
 #retrieve quizzes by lessonId
-@app.route("/quiz/<int:lessonId>", methods=['GET'])
+@app.route("/quiz/lessonId/<int:lessonId>", methods=['GET'])
 def get_quiz_by_lessonId(lessonId):
-    quiz = Quiz.query.filter_by(lessonId=lessonId).all()
-    if quiz:
+    quizzes = Quiz.query.filter_by(lessonId=lessonId).all()
+    if quizzes:
         return jsonify(
             {
-                "data": quiz.json()
+                "data": {
+                    "quizzes": [quiz.json() for quiz in quizzes]
+                }
             }
+            
         ), 200
     return jsonify(
         {
