@@ -3,10 +3,6 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 from datetime import date
 import json
-import boto3
-import base64
-from botocore.exceptions import ClientError
-import boto3 
 import json 
 import base64
 
@@ -19,50 +15,6 @@ awsKey ='c3hnaEYzZHBYM2pPcVEweTNqVVF4RWZOVDByVzczUG93aTVpVVZWcA=='
 awsKey_bytes=awsKey.encode("ascii")
 base64_awsKey=base64.b64decode(awsKey_bytes)
 decryptedKey = base64_awsKey.decode('utf-8')
-
-def get_secret():
-    secret_name = 'arn:aws:secretsmanager:us-east-1:216328872487:secret:spmrdsdb-bi1DIg'
-    region_name = 'us-east-1'
-
-    # Create a Secrets Manager client
-    session = boto3.session.Session()
-    client = session.client(
-        service_name='secretsmanager',
-        region_name=region_name,
-        aws_access_key_id=decryptedId,
-        aws_secret_access_key=decryptedKey
-    )
-
-    try:
-        get_secret_value_response = client.get_secret_value(
-            SecretId=secret_name
-        )
-    except ClientError as e:
-        if e.response['Error']['Code'] == 'DecryptionFailureException':
-            raise e
-        elif e.response['Error']['Code'] == 'InternalServiceErrorException':
-            raise e
-        elif e.response['Error']['Code'] == 'InvalidParameterException':
-            raise e
-        elif e.response['Error']['Code'] == 'InvalidRequestException':
-            raise e
-        elif e.response['Error']['Code'] == 'ResourceNotFoundException':
-            raise e
-    else:
-        if 'SecretString' in get_secret_value_response:
-            secret = get_secret_value_response['SecretString']
-            return json.loads(secret)
-        else:
-            secret = base64.b64decode(get_secret_value_response['SecretBinary'])
-            return json.loads(secret)
-
-s = get_secret()
-host = s['host']
-username = s['username']
-password = s['password']
-
-db_url = 'mysql+mysqlconnector://' + username + ':' + password + '@' + host + ':3306/lms'
-
 
 application = Flask(__name__)
 app = application
@@ -143,9 +95,6 @@ class Lesson(db.Model):
         list = string.split('||')
         return list
     
-    def get_lessonName(self):
-        return self.lessonName
-
     def json(self):
         return {"lessonId": self.lessonId,
                 "courseClassId": self.courseClassId, 
@@ -179,9 +128,6 @@ class Quiz(db.Model):
     numOfQns = db.Column(db.Integer(), nullable=True)
     quizLink = db.Column(db.String(999), nullable=True)
 
-    def get_lessonId(self):
-        return self.lessonId
-
     def json(self):
         return {"quizId": self.quizId, 
                 "lessonId": self.lessonId, 
@@ -193,8 +139,8 @@ class Quiz(db.Model):
 db.create_all()
 
 @app.route("/")
-def hello():
-    return "<p>If you see this page, our Flask is up!</p>"
+def welcome():
+    return "Hello! If you see this page, our Flask is up" 
 
 #start of CRUD Courses-----------------------------------------------------------
 #find all courses
@@ -788,32 +734,11 @@ def create_quiz():
 #retrieve quiz by quizId
 @app.route("/quiz/<int:quizId>", methods=['GET'])
 def view_quiz_by_quizId(quizId):
-    quiz = Quiz.query.filter_by(quizId=quizId).first()
-    if quiz:
+    course = Quiz.query.filter_by(quizId=quizId).first()
+    if course:
         return jsonify(
             {
-                "data": quiz.json()
-            }
-        ), 200
-    return jsonify(
-        {
-            "message": "Quiz is not found."
-        }
-    ), 404
-
-#retrieve quizzes by lessonId
-@app.route("/quiz/lessonId/<int:lessonId>", methods=['GET'])
-def get_quiz_by_lessonId(lessonId):
-    quizzes = Quiz.query.filter_by(lessonId=lessonId).all()
-    lesson = Lesson.query.filter_by(lessonId=lessonId).first()
-    lessonName = Lesson.get_lessonName(lesson)
-    if quizzes:
-        return jsonify(
-            {
-                "data": {
-                    "name": lessonName,
-                    "quizzes": [quiz.json() for quiz in quizzes]
-                }
+                "data": course.json()
             }
         ), 200
     return jsonify(
