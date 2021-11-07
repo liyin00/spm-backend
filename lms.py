@@ -737,11 +737,11 @@ def create_quiz():
 #retrieve quiz by quizId
 @app.route("/quiz/<int:quizId>", methods=['GET'])
 def view_quiz_by_quizId(quizId):
-    course = Quiz.query.filter_by(quizId=quizId).first()
-    if course:
+    quiz = Quiz.query.filter_by(quizId=quizId).first()
+    if quiz:
         return jsonify(
             {
-                "data": course.json()
+                "data": quiz.json()
             }
         ), 200
     return jsonify(
