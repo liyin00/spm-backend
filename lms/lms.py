@@ -143,6 +143,9 @@ class Lesson(db.Model):
         list = string.split('||')
         return list
     
+    def get_lessonName(self):
+        return self.lessonName
+
     def json(self):
         return {"lessonId": self.lessonId,
                 "courseClassId": self.courseClassId, 
@@ -175,6 +178,9 @@ class Quiz(db.Model):
     passingMark = db.Column(db.Integer(), nullable=True)
     numOfQns = db.Column(db.Integer(), nullable=True)
     quizLink = db.Column(db.String(999), nullable=True)
+
+    def get_lessonId(self):
+        return self.lessonId
 
     def json(self):
         return {"quizId": self.quizId, 
@@ -782,11 +788,32 @@ def create_quiz():
 #retrieve quiz by quizId
 @app.route("/quiz/<int:quizId>", methods=['GET'])
 def view_quiz_by_quizId(quizId):
-    course = Quiz.query.filter_by(quizId=quizId).first()
-    if course:
+    quiz = Quiz.query.filter_by(quizId=quizId).first()
+    if quiz:
         return jsonify(
             {
-                "data": course.json()
+                "data": quiz.json()
+            }
+        ), 200
+    return jsonify(
+        {
+            "message": "Quiz is not found."
+        }
+    ), 404
+
+#retrieve quizzes by lessonId
+@app.route("/quiz/lessonId/<int:lessonId>", methods=['GET'])
+def get_quiz_by_lessonId(lessonId):
+    quizzes = Quiz.query.filter_by(lessonId=lessonId).all()
+    lesson = Lesson.query.filter_by(lessonId=lessonId).first()
+    lessonName = Lesson.get_lessonName(lesson)
+    if quizzes:
+        return jsonify(
+            {
+                "data": {
+                    "name": lessonName,
+                    "quizzes": [quiz.json() for quiz in quizzes]
+                }
             }
         ), 200
     return jsonify(
