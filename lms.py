@@ -681,7 +681,7 @@ def get_engineers_by_name(name):
     if engineers:
         return jsonify(
             {
-                "data": engineers.json()
+                "data": [engineer.json() for engineer in engineers]
             }
         ), 200
     return jsonify(
@@ -785,6 +785,28 @@ def update_by_quizId():
             "data": quiz_info.json()
         }
     ), 201
+
+#retrieve quizzes by lessonId
+@app.route("/quiz/lessonId/<int:lessonId>", methods=['GET'])
+def get_quiz_by_lessonId(lessonId):
+    quizzes = Quiz.query.filter_by(lessonId=lessonId).all()
+    lesson = Lesson.query.filter_by(lessonId=lessonId).first()
+    lessonName = Lesson.get_lessonName(lesson)
+    if quizzes:
+        return jsonify(
+            {
+                "data": {
+                    "name": lessonName,
+                    "quizzes": [quiz.json() for quiz in quizzes]
+                }
+            }
+            
+        ), 200
+    return jsonify(
+        {
+            "message": "Quiz is not found."
+        }
+    ), 404
     
 #End of Quiz Crud ----------------------------------
 

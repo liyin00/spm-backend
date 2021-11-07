@@ -1,7 +1,7 @@
 import unittest
 import flask_testing
 import json
-from lms import app, db, Quiz
+from lms import app, db, Quiz, Lesson
 
 class TestApp(flask_testing.TestCase):
     app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite://"
@@ -111,6 +111,49 @@ class TestQuizzes(TestApp):
                 "quizLink": "https://quiz-maker.com/1"
             }
         })
+
+    #test get all quizzes with the same lessonId
+    def test_get_quiz_by_lessonId(self):
+        l1 = Lesson(courseClassId = 1, lessonName = 'abc',
+                    lessonContent = "abc||123||lol", links = "www.google.com||www.googledrive.com")
+        db.session.add(l1)
+        q1 = Quiz(quizId = 1, lessonId = 1, isGraded = 1,
+                    passingMark = 5, numOfQns = 10, quizLink = "https://quiz-maker.com/1", isActive = 'True')
+        q2 = Quiz(quizId = 2, lessonId = 1, isGraded = 1,
+                    passingMark = 7, numOfQns = 14, quizLink = "https://quiz-maker.com/2", isActive = 'False')
+        db.session.add(q1)
+        db.session.add(q2)
+        db.session.commit()
+
+        response = self.client.get("/quiz/lessonId/1")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json, {
+            "data":{
+                "name": 'abc',
+                "quizzes": [
+                    {
+                        "quizId": 1,
+                        "lessonId": 1,
+                        "isGraded": 1,
+                        "passingMark": 5,
+                        "numOfQns": 10,
+                        "quizLink": "https://quiz-maker.com/1",
+                        "isActive": "True"
+                    },
+                    {
+                        "quizId": 2,
+                        "lessonId": 1,
+                        "isGraded": 1,
+                        "passingMark": 7,
+                        "numOfQns": 14,
+                        "quizLink": "https://quiz-maker.com/2",
+                        "isActive": "False"
+                    }
+                ]
+            }
+        })
+    
 
 
 if __name__ == '__main__':
