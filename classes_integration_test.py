@@ -1,4 +1,5 @@
 import unittest
+from flask.globals import request
 import flask_testing
 import json
 from datetime import datetime
