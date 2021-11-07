@@ -10,11 +10,8 @@ application = Flask(__name__)
 app = application
 CORS(app)  
 
-# import os
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://admin:squidgame@myrdsdb.c7qjuvz5dlnv.us-east-1.rds.amazonaws.com:3306/lms'
-#environ.get('dbURL')
 app.config['CORS_HEADERS'] = 'Content-Type'
-# app.config['SQLALCHEMY_DATABASE_URI'] = db_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {'pool_recycle': 299}
 
