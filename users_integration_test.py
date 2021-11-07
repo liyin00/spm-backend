@@ -266,17 +266,15 @@ class TestUsers(TestApp):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json, {
-            'data':{
-                [
-                    {
-                        "name": "testengineer1",
-                        "subrole": "testsubrole1",
-                        "department": "Engineer",
-                        "email": "testengineer1@email.com",
-                        "userId": 1
-                    }
-                ]
-            },
+            'data': [
+                {
+                    "name": "testengineer1",
+                    "subrole": "testsubrole1",
+                    "department": "Engineer",
+                    "email": "testengineer1@email.com",
+                    "userId": 1
+                }
+            ]
         })
 
     #test get user by name if user name does not exist in database
