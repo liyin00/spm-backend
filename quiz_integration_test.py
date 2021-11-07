@@ -1,7 +1,7 @@
 import unittest
 import flask_testing
 import json
-from lms import app, db, Quiz
+from lms import app, db, Quiz, Lesson
 
 class TestApp(flask_testing.TestCase):
     app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite://"
@@ -29,7 +29,8 @@ class TestQuizzes(TestApp):
             "isGraded": 1,
             "passingMark": 5,
             "numOfQns": 10,
-            "quizLink": "https://quiz-maker.com/1"
+            "quizLink": "https://quiz-maker.com/1",
+            "isActive": 'True'
         }
 
         response = self.client.post("/quiz/add",
@@ -43,14 +44,15 @@ class TestQuizzes(TestApp):
                 "isGraded": 1,
                 "passingMark": 5,
                 "numOfQns": 10,
-                "quizLink": "https://quiz-maker.com/1"
+                "quizLink": "https://quiz-maker.com/1",
+                "isActive": 'True'
             }
         })
 
     #test view/read quiz
     def test_view_quiz_by_quizId(self):
         q1 = Quiz(quizId = 1, lessonId = 1, isGraded = 1,
-                    passingMark = 5, numOfQns = 10, quizLink = "https://quiz-maker.com/1")
+                    passingMark = 5, numOfQns = 10, quizLink = "https://quiz-maker.com/1", isActive = 'True')
         db.session.add(q1)
         db.session.commit()
 
@@ -64,16 +66,20 @@ class TestQuizzes(TestApp):
                 "isGraded": 1,
                 "passingMark": 5,
                 "numOfQns": 10,
-                "quizLink": "https://quiz-maker.com/1"
+                "quizLink": "https://quiz-maker.com/1",
+                "isActive": 'True'
             }
         })
 
     #test get all quizzes with the same lessonId
     def test_get_quiz_by_lessonId(self):
+        l1 = Lesson(courseClassId = 1, lessonName = 'abc',
+                    lessonContent = "abc||123||lol", links = "www.google.com||www.googledrive.com")
+        db.session.add(l1)
         q1 = Quiz(quizId = 1, lessonId = 1, isGraded = 1,
-                    passingMark = 5, numOfQns = 10, quizLink = "https://quiz-maker.com/1")
+                    passingMark = 5, numOfQns = 10, quizLink = "https://quiz-maker.com/1", isActive = 'True')
         q2 = Quiz(quizId = 2, lessonId = 1, isGraded = 1,
-                    passingMark = 7, numOfQns = 14, quizLink = "https://quiz-maker.com/2")
+                    passingMark = 7, numOfQns = 14, quizLink = "https://quiz-maker.com/2", isActive = 'False')
         db.session.add(q1)
         db.session.add(q2)
         db.session.commit()
@@ -83,6 +89,7 @@ class TestQuizzes(TestApp):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json, {
             "data":{
+                "name": 'abc',
                 "quizzes": [
                     {
                         "quizId": 1,
@@ -90,7 +97,8 @@ class TestQuizzes(TestApp):
                         "isGraded": 1,
                         "passingMark": 5,
                         "numOfQns": 10,
-                        "quizLink": "https://quiz-maker.com/1"
+                        "quizLink": "https://quiz-maker.com/1",
+                        "isActive": "True"
                     },
                     {
                         "quizId": 2,
@@ -98,7 +106,8 @@ class TestQuizzes(TestApp):
                         "isGraded": 1,
                         "passingMark": 7,
                         "numOfQns": 14,
-                        "quizLink": "https://quiz-maker.com/2"
+                        "quizLink": "https://quiz-maker.com/2",
+                        "isActive": "False"
                     }
                 ]
             }
@@ -107,7 +116,7 @@ class TestQuizzes(TestApp):
     #test delete quiz 
     def test_delete_quiz(self):
         q1 = Quiz(quizId = 1, lessonId = 1, isGraded = 1,
-                    passingMark = 5, numOfQns = 10, quizLink = "https://quiz-maker.com/1")
+                    passingMark = 5, numOfQns = 10, quizLink = "https://quiz-maker.com/1", isActive = 'True')
         db.session.add(q1)
         db.session.commit()
 
@@ -120,7 +129,7 @@ class TestQuizzes(TestApp):
     #test update existing quiz
     def test_update_quiz(self):
         q1 = Quiz(quizId = 1, lessonId = 1, isGraded = 1,
-                    passingMark = 5, numOfQns = 10, quizLink = "https://quiz-maker.com/1")
+                    passingMark = 5, numOfQns = 10, quizLink = "https://quiz-maker.com/1", isActive = 'True')
         db.session.add(q1)
         db.session.commit()
 
@@ -130,7 +139,8 @@ class TestQuizzes(TestApp):
             "isGraded": 1,
             "passingMark": 7,
             "numOfQns": 14,
-            "quizLink": "https://quiz-maker.com/1"
+            "quizLink": "https://quiz-maker.com/1",
+            "isActive": 'False'
         }
 
         response = self.client.post("/quiz/update",
@@ -144,7 +154,8 @@ class TestQuizzes(TestApp):
                 "isGraded": 1,
                 "passingMark": 7,
                 "numOfQns": 14,
-                "quizLink": "https://quiz-maker.com/1"
+                "quizLink": "https://quiz-maker.com/1",
+                "isActive": 'False'
             }
         })
 
