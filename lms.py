@@ -3,66 +3,9 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 from datetime import date
 import json
-import boto3
 import base64
-from botocore.exceptions import ClientError
-import boto3 
 import json 
 import base64
-
-awsId = 'QUtJQVRFWFJVVUlUWVlNUUJMUDQ='
-awsId_bytes=awsId.encode("ascii")
-base64_awsId=base64.b64decode(awsId_bytes)
-decryptedId = base64_awsId.decode('utf-8')
-
-awsKey ='c3hnaEYzZHBYM2pPcVEweTNqVVF4RWZOVDByVzczUG93aTVpVVZWcA=='
-awsKey_bytes=awsKey.encode("ascii")
-base64_awsKey=base64.b64decode(awsKey_bytes)
-decryptedKey = base64_awsKey.decode('utf-8')
-
-def get_secret():
-    secret_name = 'arn:aws:secretsmanager:us-east-1:216328872487:secret:spmrdsdb-bi1DIg'
-    region_name = 'us-east-1'
-
-    # Create a Secrets Manager client
-    session = boto3.session.Session()
-    client = session.client(
-        service_name='secretsmanager',
-        region_name=region_name,
-        aws_access_key_id=decryptedId,
-        aws_secret_access_key=decryptedKey
-    )
-
-    try:
-        get_secret_value_response = client.get_secret_value(
-            SecretId=secret_name
-        )
-    except ClientError as e:
-        if e.response['Error']['Code'] == 'DecryptionFailureException':
-            raise e
-        elif e.response['Error']['Code'] == 'InternalServiceErrorException':
-            raise e
-        elif e.response['Error']['Code'] == 'InvalidParameterException':
-            raise e
-        elif e.response['Error']['Code'] == 'InvalidRequestException':
-            raise e
-        elif e.response['Error']['Code'] == 'ResourceNotFoundException':
-            raise e
-    else:
-        if 'SecretString' in get_secret_value_response:
-            secret = get_secret_value_response['SecretString']
-            return json.loads(secret)
-        else:
-            secret = base64.b64decode(get_secret_value_response['SecretBinary'])
-            return json.loads(secret)
-
-s = get_secret()
-host = s['host']
-username = s['username']
-password = s['password']
-
-db_url = 'mysql+mysqlconnector://' + username + ':' + password + '@' + host + ':3306/lms'
-
 
 application = Flask(__name__)
 app = application

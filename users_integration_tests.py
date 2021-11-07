@@ -56,7 +56,7 @@ class TestUsers(TestApp):
 
     #test get all users when database is empty
     def test_get_all_users_empty(self):
-        response = self.client.get('/users')
+        response = self.client.get('/user')
         self.assertEqual(response.status_code, 404)
         self.assertEqual(response.json, {
             "message": "There are no available users."
@@ -266,13 +266,13 @@ class TestUsers(TestApp):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json, {
-            'data':{
+            'data':[{
                 "name": "testengineer1",
                 "subrole": "testsubrole1",
                 "department": "Engineer",
                 "email": "testengineer1@email.com",
                 "userId": 1
-            },
+            }]
         })
 
     #test get user by name if user name does not exist in database
