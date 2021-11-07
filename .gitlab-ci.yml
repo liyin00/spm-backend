@@ -1,7 +1,3 @@
-# before_script:
-#   - apt-get install -y python-pip 
-#   - pip install -r requirements.txt
-
 stages:
     - test
     - build
@@ -19,6 +15,9 @@ test:
     - pip3 install -r requirements.txt
   script:
     - python classes_integration_test.py 
+    - python courses_integration_test.py
+    - python lessons_integration_test.py
+    - python users_integration_test.py
 
 
 build:
@@ -40,21 +39,3 @@ deploy:
     - if: '$CI_COMMIT_REF_NAME == "SPMG6T9-75-cicd"'
   script: 
     - aws ecs update-service --cluster spm-g2t9 --service spm-g2t9 --force-new-deployment
-
-# scripts-test:
-#   stage: test 
-#   script: 
-#     - python-pip install -r requirements.txt
-#     - python classes_integration_test.py
-#     - python courses_integration_test.py
-#     - python lessons_integration_test.py
-#     - python users_integration_test.py
-
-# deploy-ecs:
-#   stage: deploy 
-#   rules: 
-#     - if: '$CI_COMMIT_REF_NAME == "SPMG6T9-75-cicd"'
-#   script: 
-#     # - aws ecs update-task-definition
-#     - aws ecs update-service --cluster liyin-spm --service spm-backend --force-new-deployment
-    # - aws ecs update-service --force-new-deployment
