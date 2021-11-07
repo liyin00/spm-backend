@@ -171,9 +171,26 @@ def get_all():
         }
     ), 404
 
+#search course by course id
+@app.route("/course/id/<int:courseId>", methods=['GET'])
+def find_by_CourseID(courseId):
+    course = Course.query.filter_by(courseId=courseId).first()
+    if course:
+        return jsonify(
+            {
+                "data": course.json()
+            }
+        ), 200
+    return jsonify(
+        {
+            "message": "Course Info not found."
+        }
+        
+    ), 404
+
 #search course by course name
 @app.route("/course/<string:courseName>", methods=['GET'])
-def find_by_CourseID(courseName):
+def find_by_CourseName(courseName):
     course = Course.query.filter_by(courseName=courseName).first()
     if course:
         return jsonify(
@@ -273,7 +290,7 @@ def update_by_courseId():
 #start of CRUD Classes------------------------------------------------------------------------   
 
 # find classes based on trainerId 
-@app.route("/class/<int:trainerId>", methods=['GET'])
+@app.route("/class/trainer/<int:trainerId>", methods=['GET'])
 def find_class_by_trainerID(trainerId):
     course_classes = CourseClass.query.filter_by(trainerId=trainerId).all()
     infos = []
@@ -313,7 +330,7 @@ def find_by_classID(courseClassId):
     if course_class:
         return jsonify(
             {
-                "data": course_class.json()
+                "data": [info.json() for info in course_class]
             }
         ), 200
     return jsonify(
@@ -355,7 +372,7 @@ def find_by_classID(courseClassId):
 
 
 #find class based on courseId
-@app.route("/class/<int:courseId>", methods=['GET'])
+@app.route("/class/course/<int:courseId>", methods=['GET'])
 def find_class_by_CourseID(courseId):
     course_classes = CourseClass.query.filter_by(courseId=courseId).all()
     infos = []
