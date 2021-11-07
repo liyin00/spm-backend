@@ -56,7 +56,7 @@ class TestUsers(TestApp):
 
     #test get all users when database is empty
     def test_get_all_users_empty(self):
-        response = self.client.get('/users')
+        response = self.client.get('/user')
         self.assertEqual(response.status_code, 404)
         self.assertEqual(response.json, {
             "message": "There are no available users."
