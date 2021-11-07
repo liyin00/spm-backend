@@ -1,71 +1,3 @@
-import unittest
-import flask_testing
-import json
-from datetime import datetime
-from lms import app, db, CourseClass, Course, User
-
-class TestApp(flask_testing.TestCase):
-    app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite://"
-    app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {}
-    app.config['TESTING'] = True
-    maxDiff = None
-
-    def create_app(self):
-        return app
-
-    def setUp(self):
-        db.create_all()
-
-    def tearDown(self):
-        db.session.remove()
-        db.drop_all()
-
-
-class TestCourseClasses(TestApp):
-    #test searching classes by courseId
-    def test_searching_classes(self):
-        c1 = Course(courseId = 1, courseName = 'abc', courseDesc = '123',
-                    prerequisites = "def", isActive = 1)
-        db.session.add(c1)
-        test_user1 = User(name = 'testuser1', subrole = 'testsubrole1',
-                    department = "testdepartment1", email = "testuser1@email.com")
-        db.session.add(test_user1)
-        cc1 = CourseClass(courseId = 1, startDateTime = datetime(2021, 10, 8), 
-                            endDateTime = datetime(2021, 10, 9), learnerIds = "{'a': 1, 'b': 0, 'c': 1}",
-                            trainerId = 1, classSize = 10)
-        cc2 = CourseClass(courseId = 1, learnerIds = "{}")
-        db.session.add(cc1)
-        db.session.add(cc2)
-        db.session.commit()
-
-        response = self.client.get('/class/1')
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json, {
-            'data':{
-                "classes": [
-                    {
-                        "classSize": 10,
-                        "courseClassId": 1,
-                        "courseId": 1,
-                        "endDateTime": 'Sat, 09 Oct 2021 00:00:00 GMT',
-                        "learnerIds": {'a': 1, 'b': 0, 'c': 1},
-                        "startDateTime": 'Fri, 08 Oct 2021 00:00:00 GMT',
-                        "trainerId": 1
-                    },
-                    {
-                        "classSize": None,
-                        "courseClassId": 2,
-                        "courseId": 1,
-                        "endDateTime": None,
-                        "learnerIds": {},
-                        "startDateTime": None,
-                        "trainerId": None
-                    }
-                ],
-                "info": [['abc', 'testuser1'], ['abc', '']]
-            }
-        })
-
     #test searching non-existent classes by courseId
     def test_searching_empty_classes(self):
         cc1 = CourseClass(courseId = 1, startDateTime = datetime(2021, 10, 8), 
@@ -407,6 +339,3 @@ class TestCourseClasses(TestApp):
         self.assertEqual(response.json, {
             "message": "Learner is not in this class."
         })
-
-if __name__ == '__main__':
-    unittest.main()

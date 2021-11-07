@@ -39,6 +39,9 @@ class Course(db.Model):
     prerequisites = db.Column(db.String(999), nullable=False) #db cannot store list NEEDS CHANGE
     isActive = db.Column(db.Integer(), nullable=False)
 
+    def get_courseName(self):
+        return self.courseName
+
     def json(self):
         return {"courseId": self.courseId, 
                 "courseName": self.courseName, 
@@ -63,6 +66,12 @@ class CourseClass(db.Model):
         new_dict = json.loads(json_acceptable_string)
         return new_dict
     
+    def get_courseId(self):
+        return self.courseId
+
+    def get_trainerId(self):
+        return self.trainerId
+
     def json(self):
         return {"courseClassId": self.courseClassId,
                 "courseId": self.courseId, 
@@ -110,6 +119,9 @@ class User(db.Model):
     subrole = db.Column(db.String(100), nullable=False)
     department = db.Column(db.String(100), nullable=False)
     email = db.Column(db.String(100), nullable=False)
+
+    def get_name(self):
+        return self.name
 
     def json(self):
         return {"userId": self.userId,
@@ -267,14 +279,27 @@ def update_by_courseId():
 @app.route("/class/<int:courseId>", methods=['GET'])
 def find_class_by_CourseID(courseId):
     course_classes = CourseClass.query.filter_by(courseId=courseId).all()
+    infos = []
     if course_classes:
         for class_info in course_classes:
-            class_info.learnerIds = CourseClass.change_to_dict(class_info)
+            courseId = CourseClass.get_courseId(class_info)
+            course = Course.query.filter_by(courseId=courseId).first()
+            courseName = Course.get_courseName(course)
+            trainerId = CourseClass.get_trainerId(class_info)
+            if trainerId:
+                trainer = User.query.filter_by(userId=trainerId).first()
+                trainerName = User.get_name(trainer)
+            else:
+                trainerName = ''
+            infos.append([courseName, trainerName])
+        for class_info in course_classes:
+            class_info.learnerIds = CourseClass.change_to_dict(class_info)            
         return jsonify(
             {
                 "data": {
-                    "classes": [course_class.json() for course_class in course_classes]
-                }
+                    "classes": [course_class.json() for course_class in course_classes],
+                    "info": infos
+                }  
             }
         ), 200
     return jsonify(
