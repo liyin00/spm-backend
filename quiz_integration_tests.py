@@ -113,42 +113,6 @@ class TestQuizzes(TestApp):
                 ]
             }
         })
-
-    #test get all quizzes with the same lessonId
-    def test_get_quiz_by_lessonId(self):
-        q1 = Quiz(quizId = 1, lessonId = 1, isGraded = 1,
-                    passingMark = 5, numOfQns = 10, quizLink = "https://quiz-maker.com/1")
-        q2 = Quiz(quizId = 2, lessonId = 1, isGraded = 1,
-                    passingMark = 7, numOfQns = 14, quizLink = "https://quiz-maker.com/2")
-        db.session.add(q1)
-        db.session.add(q2)
-        db.session.commit()
-
-        response = self.client.get("/quiz/lessonId/1")
-
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json, {
-            "data":{
-                "quizzes": [
-                    {
-                        "quizId": 1,
-                        "lessonId": 1,
-                        "isGraded": 1,
-                        "passingMark": 5,
-                        "numOfQns": 10,
-                        "quizLink": "https://quiz-maker.com/1"
-                    },
-                    {
-                        "quizId": 2,
-                        "lessonId": 1,
-                        "isGraded": 1,
-                        "passingMark": 7,
-                        "numOfQns": 14,
-                        "quizLink": "https://quiz-maker.com/2"
-                    }
-                ]
-            }
-        })
     
     #test delete quiz 
     def test_delete_quiz(self):
