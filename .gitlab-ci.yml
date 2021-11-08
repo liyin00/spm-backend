@@ -36,6 +36,7 @@ deploy:
     - spm-windows-runner
   image: registry.gitlab.com/liyin001/spm-backend:latest
   rules: 
-    - if: '$CI_COMMIT_REF_NAME == "main"'
+    - if: $CI_COMMIT_BRANCH == "main"
+    # - if: '$CI_COMMIT_REF_NAME == "main"'
   script: 
     - aws ecs update-service --cluster spm-g2t9 --service spm-g2t9 --force-new-deployment
