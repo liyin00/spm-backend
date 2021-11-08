@@ -798,5 +798,36 @@ class TestCourseClasses(TestApp):
             "completed": [[3, 'cab']]
         })
 
+    #test find all lerners
+    def test_find_all_learners(self):
+        c1 = Course(courseId = 1, courseName = 'abc', courseDesc = '123',
+                    prerequisites = "def", isActive = 1)
+        c2 = Course(courseId = 2, courseName = 'bac', courseDesc = '123',
+                    prerequisites = "def", isActive = 1)
+        c3 = Course(courseId = 3, courseName = 'cab', courseDesc = '123',
+                    prerequisites = "def", isActive = 1)
+        db.session.add(c1)
+        db.session.add(c2)
+        db.session.add(c3)
+        test_user1 = User(name = 'testuser1', subrole = 'testsubrole1',
+                    department = "testdepartment1", email = "testuser1@email.com")
+        db.session.add(test_user1)
+        cc1 = CourseClass(courseId = 1, startDateTime = datetime(2021, 10, 8), 
+                            endDateTime = datetime(2021, 10, 9), learnerIds = "{'1': 0, '2': 2, '3': 1}",
+                            trainerId = 1, classSize = 10)
+        cc2 = CourseClass(courseId = 2, learnerIds = "{'1': 1, '2': 0, '3': 2}")
+        cc3 = CourseClass(courseId = 3, learnerIds = "{'1': 2, '2': 1, '3': 0}")
+        db.session.add(cc1)
+        db.session.add(cc2)
+        db.session.add(cc3)
+        db.session.commit()
+
+        response = self.client.get('/class/all')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json, {
+            "pending": [[1, 1, 'abc'], [2, 2, 'bac'], [3, 3, 'cab']],
+            "approved": [[3, 1, 'abc'], [1, 2, 'bac'], [2, 3, 'cab']],
+            "completed": [[2, 1, 'abc'], [3, 2, 'bac'], [1, 3, 'cab']]
+        })
 if __name__ == '__main__':
     unittest.main()

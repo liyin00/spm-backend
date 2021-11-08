@@ -729,6 +729,41 @@ def find_classes_using_learnerId(learnerId):
         }
     ), 200
 
+#find all learners
+@app.route("/class/all", methods=['GET'])
+def find_all_classes_and_learnerId():
+    course_classes = CourseClass.query.all()
+    approved = []
+    pending = []
+    completed = []
+    for course_class in course_classes:
+        all_ids = CourseClass.change_to_dict(course_class)
+        if len(all_ids) == 0:
+            pass
+        else:
+            for key in all_ids:
+                if all_ids[key] == 0:
+                    courseId = CourseClass.get_courseId(course_class)
+                    course = Course.query.filter_by(courseId=courseId).first()
+                    courseName = Course.get_courseName(course)
+                    pending.append([int(key), courseId, courseName])
+                if all_ids[key] == 1:
+                    courseId = CourseClass.get_courseId(course_class)
+                    course = Course.query.filter_by(courseId=courseId).first()
+                    courseName = Course.get_courseName(course)
+                    approved.append([int(key), courseId, courseName])
+                if all_ids[key] == 2:
+                    courseId = CourseClass.get_courseId(course_class)
+                    course = Course.query.filter_by(courseId=courseId).first()
+                    courseName = Course.get_courseName(course)
+                    completed.append([int(key), courseId, courseName])
+    return jsonify(
+        {
+            "pending": pending,
+            "approved": approved,
+            "completed": completed 
+        }
+    ), 200
 #end of CRUD classes--------------------------------------------------------------------------
 
 #start of create sections-----------------------------------------------------------
