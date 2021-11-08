@@ -465,5 +465,59 @@ class TestCourseClasses(TestApp):
             "message": "Trainer has no classes."
         })
 
+    #test find class based on courseClassId
+    def test_searching_classes_by_id(self):
+        c1 = Course(courseId = 1, courseName = 'abc', courseDesc = '123',
+                    prerequisites = "def", isActive = 1)
+        db.session.add(c1)
+        test_user1 = User(name = 'testuser1', subrole = 'testsubrole1',
+                    department = "testdepartment1", email = "testuser1@email.com")
+        db.session.add(test_user1)
+        cc1 = CourseClass(courseId = 1, startDateTime = datetime(2021, 10, 8), 
+                            endDateTime = datetime(2021, 10, 9), learnerIds = "{'a': 1, 'b': 0, 'c': 1}",
+                            trainerId = 1, classSize = 10)
+        cc2 = CourseClass(courseId = 1, learnerIds = "{}")
+        db.session.add(cc1)
+        db.session.add(cc2)
+        db.session.commit()
+
+        response = self.client.get('/class/1')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json, {
+            'data':[
+                    {
+                        "classSize": 10,
+                        "courseClassId": 1,
+                        "courseId": 1,
+                        "endDateTime": 'Sat, 09 Oct 2021 00:00:00 GMT',
+                        "learnerIds": "{'a': 1, 'b': 0, 'c': 1}",
+                        "startDateTime": 'Fri, 08 Oct 2021 00:00:00 GMT',
+                        "trainerId": 1
+                    }
+                ]
+        })
+
+    #test find class based on non-existant courseClassId
+    def test_searching_classes_by_nonexistant_id(self):
+        c1 = Course(courseId = 1, courseName = 'abc', courseDesc = '123',
+                    prerequisites = "def", isActive = 1)
+        db.session.add(c1)
+        test_user1 = User(name = 'testuser1', subrole = 'testsubrole1',
+                    department = "testdepartment1", email = "testuser1@email.com")
+        db.session.add(test_user1)
+        cc1 = CourseClass(courseId = 1, startDateTime = datetime(2021, 10, 8), 
+                            endDateTime = datetime(2021, 10, 9), learnerIds = "{'a': 1, 'b': 0, 'c': 1}",
+                            trainerId = 1, classSize = 10)
+        cc2 = CourseClass(courseId = 1, learnerIds = "{}")
+        db.session.add(cc1)
+        db.session.add(cc2)
+        db.session.commit()
+
+        response = self.client.get('/class/3')
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.json, {
+            "message": "No such class with this ID."
+        })
+
 if __name__ == '__main__':
     unittest.main()
