@@ -598,7 +598,6 @@ def find_learners_by_courseClassId(courseClassId):
         }
     ), 404
 
-
 #find pending learners names based on courseClassId
 @app.route("/class/pending/<int:courseClassId>", methods=['GET'])
 def find_pending_learners_by_courseClassId(courseClassId):
@@ -625,6 +624,34 @@ def find_pending_learners_by_courseClassId(courseClassId):
             "message": "Class is not found."
         }
     ), 404
+
+#find approved learners names based on courseClassId
+@app.route("/class/approved/<int:courseClassId>", methods=['GET'])
+def find_approved_learners_by_courseClassId(courseClassId):
+    course_class = CourseClass.query.filter_by(courseClassId=courseClassId).first()
+    learners = []
+    if course_class:
+        all_ids = CourseClass.change_to_dict(course_class)
+        if len(all_ids) == 0:
+            return jsonify(
+                {
+                    "message": "There are no learners in this class."
+                }
+            ), 404
+        for key in all_ids:
+            if all_ids[key] == 1:
+                learners.append(key)      
+        return jsonify(
+            {
+                "data": learners  
+            }
+        ), 200
+    return jsonify(
+        {
+            "message": "Class is not found."
+        }
+    ), 404
+
 #end of CRUD classes--------------------------------------------------------------------------
 
 #start of create sections-----------------------------------------------------------
