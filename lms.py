@@ -571,6 +571,33 @@ def cancel_learner():
             "data": class_info.json()
         }
     ), 201
+
+#find learners names based on courseClassId
+@app.route("/class/learners/<int:courseClassId>", methods=['GET'])
+def find_learners_by_courseClassId(courseClassId):
+    course_class = CourseClass.query.filter_by(courseClassId=courseClassId).first()
+    learners = []
+    if course_class:
+        all_ids = CourseClass.change_to_dict(course_class)
+        if len(all_ids) == 0:
+            return jsonify(
+                {
+                    "message": "There are no learners in this class."
+                }
+            ), 404
+        for key in all_ids:
+            learners.append(key)      
+        return jsonify(
+            {
+                "data": learners  
+            }
+        ), 200
+    return jsonify(
+        {
+            "message": "Class is not found."
+        }
+    ), 404
+
 #end of CRUD classes--------------------------------------------------------------------------
 
 #start of create sections-----------------------------------------------------------
