@@ -338,38 +338,7 @@ def find_by_classID(courseClassId):
             "message": "No such class with this ID."
         }
         
-    ), 404
-# def find_class_by_classID(courseClassId):
-#     course_classes = CourseClass.query.filter_by(courseClassId=courseClassId).all()
-#     infos = []
-#     if course_classes:
-#         for class_info in course_classes:
-#             courseId = CourseClass.get_courseId(class_info)
-#             course = Course.query.filter_by(courseId=courseId).first()
-#             courseName = Course.get_courseName(course)
-#             trainerId = CourseClass.get_trainerId(class_info)
-#             if trainerId:
-#                 trainer = User.query.filter_by(userId=trainerId).first()
-#                 trainerName = User.get_name(trainer)
-#             else:
-#                 trainerName = ''
-#             infos.append([courseName, trainerName])
-#         for class_info in course_classes:
-#             class_info.learnerIds = CourseClass.change_to_dict(class_info)            
-#         return jsonify(
-#             {
-#                 "data": {
-#                     "classes": [course_class.json() for course_class in course_classes],
-#                     "info": infos
-#                 }  
-#             }
-#         ), 200
-#     return jsonify(
-#         {
-#             "message": "No such class with this ID."
-#         }
-#     ), 404              
-
+    ), 404             
 
 #find class based on courseId
 @app.route("/class/course/<int:courseId>", methods=['GET'])
@@ -602,6 +571,93 @@ def cancel_learner():
             "data": class_info.json()
         }
     ), 201
+
+#find learners names based on courseClassId
+@app.route("/class/learners/<int:courseClassId>", methods=['GET'])
+def find_learners_by_courseClassId(courseClassId):
+    course_class = CourseClass.query.filter_by(courseClassId=courseClassId).first()
+    learners = []
+    if course_class:
+        all_ids = CourseClass.change_to_dict(course_class)
+        if len(all_ids) == 0:
+            return jsonify(
+                {
+                    "message": "There are no learners in this class."
+                }
+            ), 404
+        for key in all_ids:
+            user = User.query.filter_by(userId=int(key)).first()
+            username = User.get_name(user)
+            learners.append([key,username])      
+        return jsonify(
+            {
+                "data": learners  
+            }
+        ), 200
+    return jsonify(
+        {
+            "message": "Class is not found."
+        }
+    ), 404
+
+#find pending learners names based on courseClassId
+@app.route("/class/pending/<int:courseClassId>", methods=['GET'])
+def find_pending_learners_by_courseClassId(courseClassId):
+    course_class = CourseClass.query.filter_by(courseClassId=courseClassId).first()
+    learners = []
+    if course_class:
+        all_ids = CourseClass.change_to_dict(course_class)
+        if len(all_ids) == 0:
+            return jsonify(
+                {
+                    "message": "There are no learners in this class."
+                }
+            ), 404
+        for key in all_ids:
+            if all_ids[key] == 0:
+                user = User.query.filter_by(userId=int(key)).first()
+                username = User.get_name(user)
+                learners.append([key,username])       
+        return jsonify(
+            {
+                "data": learners  
+            }
+        ), 200
+    return jsonify(
+        {
+            "message": "Class is not found."
+        }
+    ), 404
+
+#find approved learners names based on courseClassId
+@app.route("/class/approved/<int:courseClassId>", methods=['GET'])
+def find_approved_learners_by_courseClassId(courseClassId):
+    course_class = CourseClass.query.filter_by(courseClassId=courseClassId).first()
+    learners = []
+    if course_class:
+        all_ids = CourseClass.change_to_dict(course_class)
+        if len(all_ids) == 0:
+            return jsonify(
+                {
+                    "message": "There are no learners in this class."
+                }
+            ), 404
+        for key in all_ids:
+            if all_ids[key] == 1:
+                user = User.query.filter_by(userId=int(key)).first()
+                username = User.get_name(user)
+                learners.append([key,username])        
+        return jsonify(
+            {
+                "data": learners  
+            }
+        ), 200
+    return jsonify(
+        {
+            "message": "Class is not found."
+        }
+    ), 404
+
 #end of CRUD classes--------------------------------------------------------------------------
 
 #start of create sections-----------------------------------------------------------
