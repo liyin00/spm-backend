@@ -38,7 +38,7 @@ class TestCourseClasses(TestApp):
         db.session.add(cc2)
         db.session.commit()
 
-        response = self.client.get('/class/1')
+        response = self.client.get('/class/course/1')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json, {
             'data':{
@@ -76,7 +76,7 @@ class TestCourseClasses(TestApp):
         db.session.add(cc2)
         db.session.commit()
 
-        response = self.client.get('/class/2')
+        response = self.client.get('/class/course/2')
         self.assertEqual(response.status_code, 404)
         self.assertEqual(response.json, {
             'message': "Classes was not found."

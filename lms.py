@@ -52,9 +52,12 @@ class CourseClass(db.Model):
         json_acceptable_string = string.replace("'", "\"")
         new_dict = json.loads(json_acceptable_string)
         return new_dict
-    
+        
     def get_courseId(self):
         return self.courseId
+    
+    def get_learnerIds(self):
+        return self.learnerIds
 
     def get_trainerId(self):
         return self.trainerId
@@ -168,9 +171,26 @@ def get_all():
         }
     ), 404
 
+#search course by course id
+@app.route("/course/id/<int:courseId>", methods=['GET'])
+def find_by_CourseID(courseId):
+    course = Course.query.filter_by(courseId=courseId).first()
+    if course:
+        return jsonify(
+            {
+                "data": course.json()
+            }
+        ), 200
+    return jsonify(
+        {
+            "message": "Course Info not found."
+        }
+        
+    ), 404
+
 #search course by course name
 @app.route("/course/<string:courseName>", methods=['GET'])
-def find_by_CourseID(courseName):
+def find_by_CourseName(courseName):
     course = Course.query.filter_by(courseName=courseName).first()
     if course:
         return jsonify(
@@ -267,9 +287,92 @@ def update_by_courseId():
     ), 201
 #end of CRUD courses--------------------------------------------------------------------------
 
-#start of CRUD Classes------------------------------------------------------------------------
+#start of CRUD Classes------------------------------------------------------------------------   
+
+# find classes based on trainerId 
+@app.route("/class/trainer/<int:trainerId>", methods=['GET'])
+def find_class_by_trainerID(trainerId):
+    course_classes = CourseClass.query.filter_by(trainerId=trainerId).all()
+    infos = []
+    if course_classes:
+        for class_info in course_classes:
+            courseId = CourseClass.get_courseId(class_info)
+            course = Course.query.filter_by(courseId=courseId).first()
+            courseName = Course.get_courseName(course)
+            trainerId = CourseClass.get_trainerId(class_info)
+            if trainerId:
+                trainer = User.query.filter_by(userId=trainerId).first()
+                trainerName = User.get_name(trainer)
+            else:
+                trainerName = ''
+            infos.append([courseName, trainerName])
+        for class_info in course_classes:
+            class_info.learnerIds = CourseClass.change_to_dict(class_info)            
+        return jsonify(
+            {
+                "data": {
+                    "classes": [course_class.json() for course_class in course_classes],
+                    "info": infos
+                }  
+            }
+        ), 200
+    return jsonify(
+        {
+            "message": "Trainer has no classes."
+        }
+    ), 404              
+
+
+# find classes based on courseClassId 
+@app.route("/class/<int:courseClassId>", methods=['GET'])
+def find_by_classID(courseClassId):
+    course_class = CourseClass.query.filter_by(courseClassId=courseClassId).all()
+    if course_class:
+        return jsonify(
+            {
+                "data": [info.json() for info in course_class]
+            }
+        ), 200
+    return jsonify(
+        {
+            "message": "No such class with this ID."
+        }
+        
+    ), 404
+# def find_class_by_classID(courseClassId):
+#     course_classes = CourseClass.query.filter_by(courseClassId=courseClassId).all()
+#     infos = []
+#     if course_classes:
+#         for class_info in course_classes:
+#             courseId = CourseClass.get_courseId(class_info)
+#             course = Course.query.filter_by(courseId=courseId).first()
+#             courseName = Course.get_courseName(course)
+#             trainerId = CourseClass.get_trainerId(class_info)
+#             if trainerId:
+#                 trainer = User.query.filter_by(userId=trainerId).first()
+#                 trainerName = User.get_name(trainer)
+#             else:
+#                 trainerName = ''
+#             infos.append([courseName, trainerName])
+#         for class_info in course_classes:
+#             class_info.learnerIds = CourseClass.change_to_dict(class_info)            
+#         return jsonify(
+#             {
+#                 "data": {
+#                     "classes": [course_class.json() for course_class in course_classes],
+#                     "info": infos
+#                 }  
+#             }
+#         ), 200
+#     return jsonify(
+#         {
+#             "message": "No such class with this ID."
+#         }
+#     ), 404              
+
+
 #find class based on courseId
-@app.route("/class/<int:courseId>", methods=['GET'])
+@app.route("/class/course/<int:courseId>", methods=['GET'])
 def find_class_by_CourseID(courseId):
     course_classes = CourseClass.query.filter_by(courseId=courseId).all()
     infos = []
