@@ -338,38 +338,7 @@ def find_by_classID(courseClassId):
             "message": "No such class with this ID."
         }
         
-    ), 404
-# def find_class_by_classID(courseClassId):
-#     course_classes = CourseClass.query.filter_by(courseClassId=courseClassId).all()
-#     infos = []
-#     if course_classes:
-#         for class_info in course_classes:
-#             courseId = CourseClass.get_courseId(class_info)
-#             course = Course.query.filter_by(courseId=courseId).first()
-#             courseName = Course.get_courseName(course)
-#             trainerId = CourseClass.get_trainerId(class_info)
-#             if trainerId:
-#                 trainer = User.query.filter_by(userId=trainerId).first()
-#                 trainerName = User.get_name(trainer)
-#             else:
-#                 trainerName = ''
-#             infos.append([courseName, trainerName])
-#         for class_info in course_classes:
-#             class_info.learnerIds = CourseClass.change_to_dict(class_info)            
-#         return jsonify(
-#             {
-#                 "data": {
-#                     "classes": [course_class.json() for course_class in course_classes],
-#                     "info": infos
-#                 }  
-#             }
-#         ), 200
-#     return jsonify(
-#         {
-#             "message": "No such class with this ID."
-#         }
-#     ), 404              
-
+    ), 404             
 
 #find class based on courseId
 @app.route("/class/course/<int:courseId>", methods=['GET'])
