@@ -586,7 +586,9 @@ def find_learners_by_courseClassId(courseClassId):
                 }
             ), 404
         for key in all_ids:
-            learners.append(key)      
+            user = User.query.filter_by(userId=int(key)).first()
+            username = User.get_name(user)
+            learners.append([key,username])      
         return jsonify(
             {
                 "data": learners  
@@ -613,7 +615,9 @@ def find_pending_learners_by_courseClassId(courseClassId):
             ), 404
         for key in all_ids:
             if all_ids[key] == 0:
-                learners.append(key)      
+                user = User.query.filter_by(userId=int(key)).first()
+                username = User.get_name(user)
+                learners.append([key,username])       
         return jsonify(
             {
                 "data": learners  
@@ -640,7 +644,9 @@ def find_approved_learners_by_courseClassId(courseClassId):
             ), 404
         for key in all_ids:
             if all_ids[key] == 1:
-                learners.append(key)      
+                user = User.query.filter_by(userId=int(key)).first()
+                username = User.get_name(user)
+                learners.append([key,username])        
         return jsonify(
             {
                 "data": learners  

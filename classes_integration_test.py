@@ -528,7 +528,7 @@ class TestCourseClasses(TestApp):
                     department = "testdepartment1", email = "testuser1@email.com")
         db.session.add(test_user1)
         cc1 = CourseClass(courseId = 1, startDateTime = datetime(2021, 10, 8), 
-                            endDateTime = datetime(2021, 10, 9), learnerIds = "{'a': 1, 'b': 0, 'c': 1}",
+                            endDateTime = datetime(2021, 10, 9), learnerIds = "{'1' : 1}",
                             trainerId = 1, classSize = 10)
         cc2 = CourseClass(courseId = 1, learnerIds = "{}")
         db.session.add(cc1)
@@ -538,7 +538,7 @@ class TestCourseClasses(TestApp):
         response = self.client.get('/class/learners/1')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json, {
-            "data": ['a','b','c']
+            "data": [['1','testuser1']]
         })
 
     #test find learnerName based on courseClassId in empty class
@@ -594,7 +594,7 @@ class TestCourseClasses(TestApp):
                     department = "testdepartment1", email = "testuser1@email.com")
         db.session.add(test_user1)
         cc1 = CourseClass(courseId = 1, startDateTime = datetime(2021, 10, 8), 
-                            endDateTime = datetime(2021, 10, 9), learnerIds = "{'a': 1, 'b': 0, 'c': 1}",
+                            endDateTime = datetime(2021, 10, 9), learnerIds = "{'1': 0, '2': 1}",
                             trainerId = 1, classSize = 10)
         cc2 = CourseClass(courseId = 1, learnerIds = "{}")
         db.session.add(cc1)
@@ -604,7 +604,7 @@ class TestCourseClasses(TestApp):
         response = self.client.get('/class/pending/1')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json, {
-            "data": ['b']
+            "data": [['1','testuser1']]
         })
 
     #test find pending learnerName based on courseClassId in empty class
@@ -660,7 +660,7 @@ class TestCourseClasses(TestApp):
                     department = "testdepartment1", email = "testuser1@email.com")
         db.session.add(test_user1)
         cc1 = CourseClass(courseId = 1, startDateTime = datetime(2021, 10, 8), 
-                            endDateTime = datetime(2021, 10, 9), learnerIds = "{'a': 1, 'b': 0, 'c': 1}",
+                            endDateTime = datetime(2021, 10, 9), learnerIds = "{'1': 1, '2': 0}",
                             trainerId = 1, classSize = 10)
         cc2 = CourseClass(courseId = 1, learnerIds = "{}")
         db.session.add(cc1)
@@ -670,7 +670,7 @@ class TestCourseClasses(TestApp):
         response = self.client.get('/class/approved/1')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json, {
-            "data": ['a','c']
+            "data": [['1','testuser1']]
         })
 
     #test find approved learnerName based on courseClassId in empty class
