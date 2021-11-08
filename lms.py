@@ -62,6 +62,9 @@ class CourseClass(db.Model):
     def get_trainerId(self):
         return self.trainerId
 
+    def get_courseClassId(self):
+        return self.courseClassId
+
     def json(self):
         return {"courseClassId": self.courseClassId,
                 "courseId": self.courseId, 
@@ -499,6 +502,40 @@ def accept_new_learner():
         }
     ), 201
 
+#complete class
+@app.route("/class/complete/learner", methods=['POST'])
+def learner_complete_class():
+    data = request.get_json()
+    id = data['learnerId']
+
+    if bool(CourseClass.query.filter_by(courseClassId=data['courseClassId']).first()) == False:
+        return jsonify(
+            {
+                "message": "This class does not exist."
+            }
+        ), 404
+
+    class_info = CourseClass.query.filter_by(courseClassId=data['courseClassId']).first()
+    new_dict = CourseClass.change_to_dict(class_info)
+    new_dict[id] = 2
+    class_info.learnerIds = str(new_dict)
+
+    try:
+        db.session.commit()
+    except:
+        return jsonify(
+            {
+                "message": "An error occurred when completing class."
+            }
+        ), 500
+
+    class_info.learnerIds = CourseClass.change_to_dict(class_info)
+    return jsonify(
+        {
+            "data": class_info.json()
+        }
+    ), 201
+
 #add new trainer into class
 @app.route("/class/add/trainer", methods=['POST'])
 def add_new_trainer():
@@ -658,6 +695,84 @@ def find_approved_learners_by_courseClassId(courseClassId):
         }
     ), 404
 
+#find all classes learner is in
+@app.route("/class/find/<int:learnerId>", methods=['GET'])
+def find_classes_using_learnerId(learnerId):
+    course_classes = CourseClass.query.all()
+    approved = []
+    pending = []
+    completed = []
+    for course_class in course_classes:
+        all_ids = CourseClass.change_to_dict(course_class)
+        if len(all_ids) == 0:
+            pass
+        else:
+            for key in all_ids:
+                if int(key) == learnerId:
+                        if all_ids[key] == 0:
+                            courseClassId = CourseClass.get_courseClassId(course_class)
+                            courseId = CourseClass.get_courseId(course_class)
+                            course = Course.query.filter_by(courseId=courseId).first()
+                            courseName = Course.get_courseName(course)
+                            pending.append([courseClassId, courseName])
+                        if all_ids[key] == 1:
+                            courseClassId = CourseClass.get_courseClassId(course_class)
+                            courseId = CourseClass.get_courseId(course_class)
+                            course = Course.query.filter_by(courseId=courseId).first()
+                            courseName = Course.get_courseName(course)
+                            approved.append([courseClassId, courseName])
+                        if all_ids[key] == 2:
+                            courseClassId = CourseClass.get_courseClassId(course_class)
+                            courseId = CourseClass.get_courseId(course_class)
+                            course = Course.query.filter_by(courseId=courseId).first()
+                            courseName = Course.get_courseName(course)
+                            completed.append([courseClassId, courseName])
+    return jsonify(
+        {
+            "pending": pending,
+            "approved": approved,
+            "completed": completed 
+        }
+    ), 200
+
+#find all learners
+@app.route("/class/all", methods=['GET'])
+def find_all_classes_and_learnerId():
+    course_classes = CourseClass.query.all()
+    approved = []
+    pending = []
+    completed = []
+    for course_class in course_classes:
+        all_ids = CourseClass.change_to_dict(course_class)
+        if len(all_ids) == 0:
+            pass
+        else:
+            for key in all_ids:
+                if all_ids[key] == 0:
+                    courseClassId = CourseClass.get_courseClassId(course_class)
+                    courseId = CourseClass.get_courseId(course_class)
+                    course = Course.query.filter_by(courseId=courseId).first()
+                    courseName = Course.get_courseName(course)
+                    pending.append([int(key), courseClassId, courseName])
+                if all_ids[key] == 1:
+                    courseClassId = CourseClass.get_courseClassId(course_class)
+                    courseId = CourseClass.get_courseId(course_class)
+                    course = Course.query.filter_by(courseId=courseId).first()
+                    courseName = Course.get_courseName(course)
+                    approved.append([int(key), courseClassId, courseName])
+                if all_ids[key] == 2:
+                    courseClassId = CourseClass.get_courseClassId(course_class)
+                    courseId = CourseClass.get_courseId(course_class)
+                    course = Course.query.filter_by(courseId=courseId).first()
+                    courseName = Course.get_courseName(course)
+                    completed.append([int(key), courseClassId, courseName])
+    return jsonify(
+        {
+            "pending": pending,
+            "approved": approved,
+            "completed": completed 
+        }
+    ), 200
 #end of CRUD classes--------------------------------------------------------------------------
 
 #start of create sections-----------------------------------------------------------
