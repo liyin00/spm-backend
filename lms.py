@@ -62,6 +62,9 @@ class CourseClass(db.Model):
     def get_trainerId(self):
         return self.trainerId
 
+    def get_courseClassId(self):
+        return self.courseClassId
+
     def json(self):
         return {"courseClassId": self.courseClassId,
                 "courseId": self.courseId, 
@@ -707,20 +710,23 @@ def find_classes_using_learnerId(learnerId):
             for key in all_ids:
                 if int(key) == learnerId:
                         if all_ids[key] == 0:
+                            courseClassId = CourseClass.get_courseClassId(course_class)
                             courseId = CourseClass.get_courseId(course_class)
                             course = Course.query.filter_by(courseId=courseId).first()
                             courseName = Course.get_courseName(course)
-                            pending.append([courseId, courseName])
+                            pending.append([courseClassId, courseName])
                         if all_ids[key] == 1:
+                            courseClassId = CourseClass.get_courseClassId(course_class)
                             courseId = CourseClass.get_courseId(course_class)
                             course = Course.query.filter_by(courseId=courseId).first()
                             courseName = Course.get_courseName(course)
-                            approved.append([courseId, courseName])
+                            approved.append([courseClassId, courseName])
                         if all_ids[key] == 2:
+                            courseClassId = CourseClass.get_courseClassId(course_class)
                             courseId = CourseClass.get_courseId(course_class)
                             course = Course.query.filter_by(courseId=courseId).first()
                             courseName = Course.get_courseName(course)
-                            completed.append([courseId, courseName])
+                            completed.append([courseClassId, courseName])
     return jsonify(
         {
             "pending": pending,
@@ -743,20 +749,23 @@ def find_all_classes_and_learnerId():
         else:
             for key in all_ids:
                 if all_ids[key] == 0:
+                    courseClassId = CourseClass.get_courseClassId(course_class)
                     courseId = CourseClass.get_courseId(course_class)
                     course = Course.query.filter_by(courseId=courseId).first()
                     courseName = Course.get_courseName(course)
-                    pending.append([int(key), courseId, courseName])
+                    pending.append([int(key), courseClassId, courseName])
                 if all_ids[key] == 1:
+                    courseClassId = CourseClass.get_courseClassId(course_class)
                     courseId = CourseClass.get_courseId(course_class)
                     course = Course.query.filter_by(courseId=courseId).first()
                     courseName = Course.get_courseName(course)
-                    approved.append([int(key), courseId, courseName])
+                    approved.append([int(key), courseClassId, courseName])
                 if all_ids[key] == 2:
+                    courseClassId = CourseClass.get_courseClassId(course_class)
                     courseId = CourseClass.get_courseId(course_class)
                     course = Course.query.filter_by(courseId=courseId).first()
                     courseName = Course.get_courseName(course)
-                    completed.append([int(key), courseId, courseName])
+                    completed.append([int(key), courseClassId, courseName])
     return jsonify(
         {
             "pending": pending,
