@@ -320,8 +320,24 @@ def find_class_by_trainerID(trainerId):
         {
             "message": "Trainer has no classes."
         }
-    ), 404              
+    ), 404      
 
+# find all classes 
+@app.route("/class", methods=['GET'])
+def find_all_classes():
+    course_class = CourseClass.query.all()
+    if course_class:
+        return jsonify(
+            {
+                "data": [info.json() for info in course_class]
+            }
+        ), 200
+    return jsonify(
+        {
+            "message": "There are no available classes."
+        }
+        
+    ), 404     
 
 # find classes based on courseClassId 
 @app.route("/class/<int:courseClassId>", methods=['GET'])
