@@ -449,7 +449,7 @@ def add_new_learner():
             }
         ), 500
 
-    new_dict[id] = 0
+    new_dict[str(id)] = 0
     class_info.learnerIds = str(new_dict)
 
     try:
