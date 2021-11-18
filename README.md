@@ -6,7 +6,7 @@ This repositry contains the backend system for our Software Project Management c
 + Admins for assigning learners and trainers to the courses and classes 
 
 ## Information 
-This repository has been configured with a CI/CD pipeline which leverages on Gitlab for testing and ultimately AWS ECS for deployment. The datavase 
+This repository has been configured with a CI/CD pipeline which leverages on Gitlab for testing and ultimately AWS ECS for deployment. The database involved is a MySQL database which has been deployed to AWS RDS.
 
 Backend EC2 URL: 
 > http://54.80.18.11:5000/ 
