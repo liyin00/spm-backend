@@ -34,3 +34,5 @@ pip install -r requirements.txt
 ```
 python app.py 
 ```
+
+### Group Members: Ling Li Yin, Glenda Marie Satuito, Goh Wei Jie, Jeremy Tan E-Shen
